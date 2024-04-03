@@ -1,0 +1,9 @@
+package enums;
+
+public enum RoomType {
+	JEDNOKREVETNA,
+	DVOKREVETNA,
+	DVOKREVETNA_BRACNI,
+	TROKREVETNA,
+	TROKREVETNA_BRACNI;
+}

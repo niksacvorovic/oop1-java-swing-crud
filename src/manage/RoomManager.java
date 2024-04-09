@@ -1,26 +1,25 @@
 package manage;
 
 import java.util.ArrayList;
-import enums.RoomType;
-import enums.RoomStatus;
+
 import entity.Room;
 
 public class RoomManager {
-	public ArrayList<Room> rooms;
+	ArrayList<Room> rooms;
 	
-	public void createRoom(RoomType type, RoomStatus status)
-	{
-		Room a = new Room(type, status);
-		rooms.add(a);
-	}
-	
-	public Room readRoom(Object a)
-	{
+	public void createRoom() {
 		
 	}
 	
-	public void deleteRoom(Room a)
-	{
-		rooms.remove(a);
+	public void readRoom() {
+		
+	}
+	
+	public void updateRoom() {
+		
+	}
+	
+	public void deleteRoom() {
+		
 	}
 }

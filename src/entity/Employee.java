@@ -4,18 +4,29 @@ import java.time.LocalDate;
 
 import enums.Degree;
 import enums.Gender;
+import enums.Role;
 
-public abstract class Employee extends User {
+public class Employee extends User {
+	protected Role role;
 	protected Degree degree;
 	protected LocalDate employmentDate;
 	protected double baseSalary;
 	
-	public Employee(String name, String lastName, Gender gender, LocalDate birthDate, String phoneNumber,
-			String username, String password, Degree degree, LocalDate employmentDate, double baseSalary) {
-		super(name, lastName, gender, birthDate, phoneNumber, username, password);
+	public Employee(String username, String password, String name, String lastName, Gender gender, LocalDate birthDate, String phoneNumber,
+			Role role, Degree degree, LocalDate employmentDate, double baseSalary) {
+		super(username, password, name, lastName, gender, birthDate, phoneNumber);
+		this.role = role;
 		this.degree = degree;
 		this.employmentDate = employmentDate;
 		this.baseSalary = baseSalary;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
 	}
 
 	public Degree getDegree() {

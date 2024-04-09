@@ -6,8 +6,7 @@ import enums.Gender;
 
 public class Guest extends User {
 
-	public Guest(String name, String lastName, Gender gender, LocalDate birthDate, String phoneNumber, String username,
-			String password) {
-		super(name, lastName, gender, birthDate, phoneNumber, username, password);
+	public Guest(String username, String password, String name, String lastName, Gender gender, LocalDate birthDate, String phoneNumber) {
+		super(username, password, name, lastName, gender, birthDate, phoneNumber);
 	}
 }

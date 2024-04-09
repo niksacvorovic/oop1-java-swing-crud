@@ -4,82 +4,69 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 import entity.Administrator;
-import entity.Employee;
 import enums.Degree;
 import enums.Gender;
-import interfaces.EmployeeCRUD;
 
-public class AdminManager implements EmployeeCRUD{
+public class AdminManager{
 	public ArrayList<Administrator> admins;
-	
-	@Override
-	public void createEmployee(String name, String lastName, Gender gender, LocalDate birthDate, String phoneNumber, String username, 
+
+	public void createAdmin(String name, String lastName, Gender gender, LocalDate birthDate, String phoneNumber, String username, 
 			String password, Degree degree, LocalDate employmentDate, double salary)
 	{
 		Administrator a = new Administrator(name, lastName, gender, birthDate, phoneNumber, username, password, degree, employmentDate, salary);
 		admins.add(a);
 	}
 	
-	@Override
-	public void readEmployee(Employee e)
+	public Administrator readAdmin(Administrator e) throws Exception
 	{
-		Administrator a = null;
 		boolean exists = false;
-		if(e instanceof Administrator){
-			a = (Administrator) e;
-		}
 		for(Administrator i:admins) {
-			if (a.equals(i)){
-				a = i;
+			if (e.equals(i)){
+				e = i;
 				exists = true;
 				break;
 			}
 		}
 		if (!exists) {
-			//?
+			throw new Exception("Dati objekat ne postoji u sistemu");
 		}
-		
+		return e;
 	}
-	
-	@Override
-	public void updateEmployee(Employee e, String name, String lastName, Gender gender, LocalDate birthDate, String phoneNumber, 
-			String username, String password, Degree degree, LocalDate employmentDate, double salary)
+
+	public void updateAdmin(Administrator e, String name, String lastName, Gender gender, LocalDate birthDate, String phoneNumber, 
+			String username, String password, Degree degree, LocalDate employmentDate, double salary) throws Exception
 	{
-		Administrator a = null;
 		boolean exists = false;
-		if(e instanceof Administrator){
-			a = (Administrator) e;
-		}
 		for(Administrator i:admins) {
-			if (a.equals(i)){
-				a = i;
+			if (e.equals(i)){
+				e = i;
 				exists = true;
 				break;
 			}
 		}
 		if (!exists) {
-			//?
+			throw new Exception("Dati objekat ne postoji u sistemu");
 		}
-		a.setName(name);
-		a.setLastName(lastName);
-		a.setGender(gender);
-		a.setBirthDate(birthDate);
-		a.setPhoneNumber(phoneNumber);
-		a.setUsername(username);
-		a.setPassword(password);
-		a.setDegree(degree);
-		a.setEmploymentDate(employmentDate);
-		a.setBaseSalary(salary);
+		e.setName(name);
+		e.setLastName(lastName);
+		e.setGender(gender);
+		e.setBirthDate(birthDate);
+		e.setPhoneNumber(phoneNumber);
+		e.setUsername(username);
+		e.setPassword(password);
+		e.setDegree(degree);
+		e.setEmploymentDate(employmentDate);
+		e.setBaseSalary(salary);
 	}
-	
-	@Override
-	public void deleteEmployee(Employee e) 
+
+	public void deleteEmployee(Administrator e) 
 	{
-		Administrator a = null;
-		if(e instanceof Administrator) {
-			a = (Administrator) e;
+		try {
+			admins.remove(e);
 		}
-		admins.remove(a);
+		catch(Exception ex){
+			System.out.println("Dati objekat ne postoji u sistemu");
+		}
 	}
 
 }

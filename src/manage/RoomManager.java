@@ -14,6 +14,11 @@ public class RoomManager {
 		rooms.add(a);
 	}
 	
+	public Room readRoom(Object a)
+	{
+		
+	}
+	
 	public void deleteRoom(Room a)
 	{
 		rooms.remove(a);

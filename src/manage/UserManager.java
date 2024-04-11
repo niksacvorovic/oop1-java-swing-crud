@@ -94,10 +94,6 @@ public class UserManager {
 	public void deleteUser(String username) throws Exception
 	{
 		User e = readUser(username);
-		try {
-			users.remove(e);
-		}catch(Exception ex){
-			System.out.println("Dati objekat ne postoji u sistemu");
-		}
+		users.remove(e);
 	}
 }

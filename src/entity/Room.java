@@ -4,7 +4,7 @@ import enums.RoomStatus;
 import enums.RoomType;
 
 public class Room {
-	public String roomNumber;
+	private String roomNumber;
 	public RoomType type;
 	public RoomStatus status;
 	
@@ -12,5 +12,9 @@ public class Room {
 		this.roomNumber = roomNumber;
 		this.type = type;
 		this.status = status;
+	}
+
+	public String getRoomNumber() {
+		return roomNumber;
 	}
 }

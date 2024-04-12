@@ -6,8 +6,21 @@ import enums.RoomType;
 import enums.Extras;
 
 public class Pricing {
-	public LocalDate creationDate;
-	public LocalDate expirationDate;
+	private String ID;
+	public LocalDate startDate;
+	public LocalDate endDate;
 	public HashMap<RoomType, Double> roomPrices;
 	public HashMap<Extras, Double> extrasPrices;
+	
+	public Pricing(String ID, LocalDate start, LocalDate end, HashMap<RoomType, Double> roomPrices, HashMap<Extras, Double> extrasPrices) {
+		this.ID = ID;
+		this.startDate = start;
+		this.endDate = end;
+		this.roomPrices = roomPrices;
+		this.extrasPrices = extrasPrices;
+	}
+	
+	public String getID() {
+		return ID;
+	}
 }

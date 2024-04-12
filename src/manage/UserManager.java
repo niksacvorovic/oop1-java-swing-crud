@@ -9,16 +9,22 @@ import entity.User;
 import enums.Degree;
 import enums.Gender;
 import enums.Role;
+import exceptions.DuplicateIDException;
+import exceptions.NonexistentEntityException;
 
 public class UserManager {
 	public ArrayList<User> users;
+	
+	public UserManager() {
+		this.users = new ArrayList<User>();
+	}
 
 	public void createEmployee(String username, String password, String name, String lastName, Gender gender, LocalDate birthDate, 
 			String phoneNumber, Role role, Degree degree, LocalDate employmentDate, double salary) throws Exception
 	{
 		for(User i:users) {
 			if (i.getUsername() == username) {
-				throw new Exception();
+				throw new DuplicateIDException();
 			}
 		}
 		Employee a = new Employee(username, password, name, lastName, gender, birthDate, phoneNumber, role, degree, employmentDate, salary);
@@ -30,7 +36,7 @@ public class UserManager {
 	{
 		for(User i:users) {
 			if (i.getUsername() == username) {
-				throw new Exception();
+				throw new DuplicateIDException();
 			}
 		}
 		Guest a = new Guest(username, password, name, lastName, gender, birthDate, phoneNumber);
@@ -47,7 +53,7 @@ public class UserManager {
 			}
 		}
 		if (ret == null) {
-			throw new Exception("Dati objekat ne postoji u sistemu");
+			throw new NonexistentEntityException();
 		}
 		return ret;
 	}

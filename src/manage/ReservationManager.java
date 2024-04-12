@@ -9,15 +9,22 @@ import entity.Room;
 import enums.ReservationStatus;
 import enums.Extras;
 import enums.RoomType;
+import exceptions.DuplicateIDException;
+import exceptions.NonexistentEntityException;
 
 public class ReservationManager {
 	public ArrayList<Request> requests;
 	public ArrayList<Reservation> reservations;
 	
+	public ReservationManager() {
+		this.requests = new ArrayList<Request>();
+		this.reservations = new ArrayList<Reservation>();
+	}
+	
 	public void createRequest(String ID, String username, RoomType type, LocalDate begin, LocalDate end, Extras... params) throws Exception{
 		for(Request i:requests) {
 			if(i.getID() == ID) {
-				throw new Exception();
+				throw new DuplicateIDException();
 			}
 		}
 		Request r = new Request(ID, username, ReservationStatus.NA_CEKANJU, type, begin, end, params);
@@ -33,18 +40,14 @@ public class ReservationManager {
 			}
 		}
 		if(r == null) {
-			throw new Exception();
+			throw new NonexistentEntityException();
 		}
 		return r;
 	}
 	
 	public void deleteRequest(String ID) throws Exception {
 		Request r = readRequest(ID);
-		try {
-			requests.add(r);
-		}catch (Exception ex) {
-			System.out.println("Dati objekat ne postoji u sistemu");
-		}
+		requests.remove(r);
 	}
 	
 	public void createReservation(Request r, Room room, double price) throws Exception{
@@ -62,7 +65,7 @@ public class ReservationManager {
 			}
 		}
 		if(r == null) {
-			throw new Exception();
+			throw new NonexistentEntityException();
 		}
 		return r;
 

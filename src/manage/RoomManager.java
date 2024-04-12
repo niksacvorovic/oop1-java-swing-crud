@@ -5,14 +5,20 @@ import java.util.ArrayList;
 import entity.Room;
 import enums.RoomStatus;
 import enums.RoomType;
+import exceptions.DuplicateIDException;
+import exceptions.NonexistentEntityException;
 
 public class RoomManager {
 	public ArrayList<Room> rooms;
 	
+	public RoomManager() {
+		this.rooms = new ArrayList<Room>();
+	}
+	
 	public void createRoom(String roomNumber, RoomType type) throws Exception {
 		for(Room i:rooms) {
 			if(i.getRoomNumber() == roomNumber) {
-				throw new Exception();
+				throw new DuplicateIDException();
 			}
 		}
 		Room r = new Room(roomNumber, type, RoomStatus.SLOBODNA);
@@ -28,7 +34,7 @@ public class RoomManager {
 			}
 		}
 		if(r == null) {
-			throw new Exception();
+			throw new NonexistentEntityException();
 		}
 		return r;
 	}

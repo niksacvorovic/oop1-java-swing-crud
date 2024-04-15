@@ -12,8 +12,7 @@ public class Pricing {
 	public HashMap<RoomType, Double> roomPrices;
 	public HashMap<Extras, Double> extrasPrices;
 	
-	public Pricing(String ID, LocalDate start, LocalDate end, HashMap<RoomType, Double> roomPrices, HashMap<Extras, Double> extrasPrices) {
-		this.ID = ID;
+	public Pricing(LocalDate start, LocalDate end, HashMap<RoomType, Double> roomPrices, HashMap<Extras, Double> extrasPrices) {
 		this.startDate = start;
 		this.endDate = end;
 		this.roomPrices = roomPrices;
@@ -22,5 +21,9 @@ public class Pricing {
 	
 	public String getID() {
 		return ID;
+	}
+	
+	public void setID() {
+		ID = startDate.toString() + "-" + endDate.toString(); 
 	}
 }

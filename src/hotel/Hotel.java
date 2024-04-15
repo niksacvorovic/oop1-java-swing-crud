@@ -9,6 +9,7 @@ import entity.Reservation;
 import entity.Room;
 import enums.Extras;
 import enums.ReservationStatus;
+import enums.RoomType;
 import manage.PricingManager;
 import manage.ReservationManager;
 import manage.RoomManager;
@@ -88,5 +89,47 @@ public class Hotel {
 		if(r.status == ReservationStatus.POTVDJENA && available.contains(room.getRoomNumber())) {
 			rem.createReservation(r, room, price);
 		}
+	}
+	
+	public ArrayList<RoomType> showAvailable(LocalDate begin, LocalDate end) throws Exception{
+		ArrayList<RoomType> available = new ArrayList<RoomType>();
+		LocalDate loop = begin;
+		boolean check = true;
+		while(end.compareTo(loop) >= 0) {
+			for(Room r:rom.rooms) {
+				if(available.contains(r.type)) {
+					continue;
+				}
+				check = true;
+				for(Reservation i:rem.reservations) {
+					if (!(r.getRoomNumber().equals(i.getID().substring(0, 3))) || i.end.compareTo(begin) <= 0) {
+						continue;
+					}
+					else if(i.end.compareTo(loop) > 0 && i.begin.compareTo(loop) < 0) {
+						check = false;
+					}
+				}
+				if(check == true) {
+					available.add(r.type);
+				}
+			}
+			loop = loop.plusDays(1);
+		}
+		return available;
+	}
+	
+	public ArrayList<Object> showGuestInputs(String username){
+		ArrayList<Object> ret = new ArrayList<Object>();
+		for(Request i:rem.requests) {
+			if (i.username.equals(username)) {
+				ret.add(i);
+			}
+		}
+		for(Reservation i:rem.reservations) {
+			if (i.username.equals(username)) {
+				ret.add(i);
+			}
+		}
+		return ret;
 	}
 }

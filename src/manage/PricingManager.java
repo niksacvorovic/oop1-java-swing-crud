@@ -7,7 +7,6 @@ import java.util.HashMap;
 import entity.Pricing;
 import enums.Extras;
 import enums.RoomType;
-import exceptions.DuplicateIDException;
 import exceptions.NonexistentEntityException;
 
 public class PricingManager {
@@ -17,10 +16,10 @@ public class PricingManager {
 		this.pricings = new ArrayList<Pricing>();
 	}
 	
-	public void createPricing(String ID, double[] prices, LocalDate start, LocalDate end) throws Exception{
+	public void createPricing(double[] prices, LocalDate start, LocalDate end) throws Exception{
 		for(Pricing i:pricings) {
-			if(i.getID() == ID) {
-				throw new DuplicateIDException();
+			if (!((i.startDate.compareTo(end) > 0) || (i.endDate.compareTo(start) < 0))) {
+				throw new Exception();
 			}
 		}
 		int counter = 0;
@@ -37,14 +36,15 @@ public class PricingManager {
 			extrasPrices.put(e, prices[counter]);
 			counter++;
 		}
-		Pricing p = new Pricing(ID, start, end, roomPrices, extrasPrices);
+		Pricing p = new Pricing(start, end, roomPrices, extrasPrices);
+		p.setID();
 		pricings.add(p);
 	}
 	
 	public Pricing readPricing(String ID) throws Exception{
 		Pricing p = null;
 		for(Pricing i:pricings) {
-			if(i.getID() == ID) {
+			if(i.getID().equals(ID)) {
 				p = i;
 				break;
 			}
@@ -55,6 +55,25 @@ public class PricingManager {
 		return p;
 	}
 	
+	public void updateOnePrice(String ID, RoomType room, double price) throws Exception {
+		Pricing p = readPricing(ID);
+		p.roomPrices.replace(room, price);
+	}
+	
+	public void updateOnePrice(String ID, Extras extra, double price) throws Exception {
+		Pricing p = readPricing(ID);
+		p.extrasPrices.replace(extra, price);
+	}
+	
+	public void updatePricing(String ID, LocalDate start, LocalDate end, HashMap<RoomType, Double> roomPrices, 
+			HashMap<Extras, Double> extrasPrices) throws Exception{
+		Pricing p = readPricing(ID);
+		p.startDate = start;
+		p.endDate = end;
+		p.roomPrices = roomPrices;
+		p.extrasPrices = extrasPrices;
+		p.setID();
+	}
 	public void updatePricing(String ID, double[] prices, LocalDate start, LocalDate end) throws Exception{
 		Pricing p = readPricing(ID);
 		int counter = 0;
@@ -75,6 +94,7 @@ public class PricingManager {
 		p.endDate = end;
 		p.roomPrices = roomPrices;
 		p.extrasPrices = extrasPrices;
+		p.setID();
 	}
 	
 	public void deletePricing(String ID) throws Exception{

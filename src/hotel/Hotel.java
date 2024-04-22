@@ -3,6 +3,7 @@ package hotel;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import entity.Guest;
 import entity.Pricing;
 import entity.Request;
 import entity.Reservation;
@@ -76,7 +77,7 @@ public class Hotel {
 		return price;
 	}
 	
-	public void checkIn(Request r, Room room) throws Exception {
+	public void checkIn(Request r, Room room)  {
 		LocalDate today = LocalDate.now();
 		Pricing p = null;
 		for(Pricing i:pm.pricings) {
@@ -91,7 +92,7 @@ public class Hotel {
 		}
 	}
 	
-	public ArrayList<RoomType> showAvailable(LocalDate begin, LocalDate end) throws Exception{
+	public ArrayList<RoomType> showAvailable(LocalDate begin, LocalDate end) {
 		ArrayList<RoomType> available = new ArrayList<RoomType>();
 		LocalDate loop = begin;
 		boolean check = true;
@@ -120,13 +121,14 @@ public class Hotel {
 	
 	public ArrayList<Object> showGuestInputs(String username){
 		ArrayList<Object> ret = new ArrayList<Object>();
+		Guest guest = (Guest) um.readUser(username);
 		for(Request i:rem.requests) {
-			if (i.username.equals(username)) {
+			if (i.guest.equals(guest)) {
 				ret.add(i);
 			}
 		}
 		for(Reservation i:rem.reservations) {
-			if (i.username.equals(username)) {
+			if (i.guest.equals(guest)) {
 				ret.add(i);
 			}
 		}

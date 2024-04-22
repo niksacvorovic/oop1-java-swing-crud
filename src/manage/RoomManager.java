@@ -15,7 +15,7 @@ public class RoomManager {
 		this.rooms = new ArrayList<Room>();
 	}
 	
-	public void createRoom(String roomNumber, RoomType type) throws Exception {
+	public void createRoom(String roomNumber, RoomType type)  {
 		for(Room i:rooms) {
 			if(i.getRoomNumber() == roomNumber) {
 				throw new DuplicateIDException();
@@ -25,10 +25,10 @@ public class RoomManager {
 		rooms.add(r);
 	}
 	
-	public Room readRoom(String roomNumber) throws Exception{
+	public Room readRoom(String roomNumber) {
 		Room r = null;
 		for(Room i:rooms) {
-			if(i.getRoomNumber() == roomNumber) {
+			if(i.getRoomNumber().equals(roomNumber)) {
 				r = i;
 				break;
 			}
@@ -39,13 +39,13 @@ public class RoomManager {
 		return r;
 	}
 	
-	public void updateRoom(String roomNumber, RoomType type, RoomStatus status) throws Exception {
+	public void updateRoom(String roomNumber, RoomType type, RoomStatus status)  {
 		Room r = readRoom(roomNumber);
 		r.type = type;
 		r.status = status;
 	}
 	
-	public void deleteRoom(String roomNumber) throws Exception {
+	public void deleteRoom(String roomNumber)  {
 		Room r = readRoom(roomNumber);
 		rooms.remove(r);
 	}

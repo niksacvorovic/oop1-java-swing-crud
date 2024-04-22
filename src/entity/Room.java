@@ -17,4 +17,10 @@ public class Room {
 	public String getRoomNumber() {
 		return roomNumber;
 	}
+	
+	@Override
+	public String toString() {
+		String str = "Broj sobe: " + this.roomNumber + "\nTip sobe: " + this.type.toString() + "\nStatus: " + this.status.toString();
+		return str;
+	}
 }

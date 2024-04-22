@@ -16,15 +16,15 @@ public class PricingManager {
 		this.pricings = new ArrayList<Pricing>();
 	}
 	
-	public void createPricing(double[] prices, LocalDate start, LocalDate end) throws Exception{
+	public void createPricing(double[] prices, LocalDate start, LocalDate end) {
 		for(Pricing i:pricings) {
 			if (!((i.startDate.compareTo(end) > 0) || (i.endDate.compareTo(start) < 0))) {
-				throw new Exception();
+				throw new RuntimeException();
 			}
 		}
 		int counter = 0;
 		if (prices.length != 12) {
-			throw new Exception();
+			throw new RuntimeException();
 		}
 		HashMap<RoomType, Double> roomPrices = new HashMap<RoomType, Double>();
 		HashMap<Extras, Double> extrasPrices = new HashMap<Extras, Double>();
@@ -41,7 +41,7 @@ public class PricingManager {
 		pricings.add(p);
 	}
 	
-	public Pricing readPricing(String ID) throws Exception{
+	public Pricing readPricing(String ID) {
 		Pricing p = null;
 		for(Pricing i:pricings) {
 			if(i.getID().equals(ID)) {
@@ -55,18 +55,18 @@ public class PricingManager {
 		return p;
 	}
 	
-	public void updateOnePrice(String ID, RoomType room, double price) throws Exception {
+	public void updateOnePrice(String ID, RoomType room, double price)  {
 		Pricing p = readPricing(ID);
 		p.roomPrices.replace(room, price);
 	}
 	
-	public void updateOnePrice(String ID, Extras extra, double price) throws Exception {
+	public void updateOnePrice(String ID, Extras extra, double price)  {
 		Pricing p = readPricing(ID);
 		p.extrasPrices.replace(extra, price);
 	}
 	
 	public void updatePricing(String ID, LocalDate start, LocalDate end, HashMap<RoomType, Double> roomPrices, 
-			HashMap<Extras, Double> extrasPrices) throws Exception{
+			HashMap<Extras, Double> extrasPrices) {
 		Pricing p = readPricing(ID);
 		p.startDate = start;
 		p.endDate = end;
@@ -74,11 +74,11 @@ public class PricingManager {
 		p.extrasPrices = extrasPrices;
 		p.setID();
 	}
-	public void updatePricing(String ID, double[] prices, LocalDate start, LocalDate end) throws Exception{
+	public void updatePricing(String ID, double[] prices, LocalDate start, LocalDate end) {
 		Pricing p = readPricing(ID);
 		int counter = 0;
 		if (prices.length != 12) {
-			throw new Exception();
+			throw new RuntimeException();
 		}
 		HashMap<RoomType, Double> roomPrices = new HashMap<RoomType, Double>();
 		HashMap<Extras, Double> extrasPrices = new HashMap<Extras, Double>();
@@ -97,7 +97,7 @@ public class PricingManager {
 		p.setID();
 	}
 	
-	public void deletePricing(String ID) throws Exception{
+	public void deletePricing(String ID) {
 		Pricing p = readPricing(ID);
 		pricings.remove(p);
 	}

@@ -26,4 +26,17 @@ public class Pricing {
 	public void setID() {
 		ID = startDate.toString() + "-" + endDate.toString(); 
 	}
+	
+	@Override
+	public String toString() {
+		String str = "ID: " + this.ID + "\nDatim početka važenja: " + this.startDate.toString() + "\nDatum kraja važenja: " + this.endDate; 
+		StringBuilder sb = new StringBuilder(str);
+		this.roomPrices.forEach((key, value) -> {
+			sb.append("\n" + key.toString() + ": " + value);
+		});
+		this.extrasPrices.forEach((key, value) -> {
+			sb.append("\n" + key.toString() + ": " + value);
+		});
+		return sb.toString();
+	}
 }

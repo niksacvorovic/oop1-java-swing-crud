@@ -52,4 +52,13 @@ public class Employee extends User {
 	public void setBaseSalary(double baseSalary) {
 		this.baseSalary = baseSalary;
 	}
+	
+	@Override
+	public String toString() {
+		String str = "Korisničko ime: " + this.username + "\nLozinka: " + this.password + "\nIme: " + this.name + "\nPrezime: " +
+				this.lastName + "\nPol: " + this.gender.toString() + "\nDatum rođenja: " + this.birthDate.toString() + "\nBroj telefona: " + 
+				this.phoneNumber + "\nUloga: " + this.role.toString() + "\nObrazovanje: " + this.degree.toString() + "\nDatum zaposlenja: "
+				+ this.employmentDate.toString() + "\nOsnova plate: " + this.baseSalary;
+		return str;
+	}
 }

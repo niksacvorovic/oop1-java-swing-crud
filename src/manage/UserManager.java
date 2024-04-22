@@ -20,7 +20,7 @@ public class UserManager {
 	}
 
 	public void createEmployee(String username, String password, String name, String lastName, Gender gender, LocalDate birthDate, 
-			String phoneNumber, Role role, Degree degree, LocalDate employmentDate, double salary) throws Exception
+			String phoneNumber, Role role, Degree degree, LocalDate employmentDate, double salary) 
 	{
 		for(User i:users) {
 			if (i.getUsername() == username) {
@@ -32,7 +32,7 @@ public class UserManager {
 	}
 	
 	public void createGuest(String username, String password, String name, String lastName, Gender gender, LocalDate birthDate, 
-			String phoneNumber) throws Exception
+			String phoneNumber) 
 	{
 		for(User i:users) {
 			if (i.getUsername() == username) {
@@ -43,7 +43,7 @@ public class UserManager {
 		users.add(a);
 	}
 	
-	public User readUser(String username) throws Exception
+	public User readUser(String username) 
 	{
 		User ret = null;
 		for(User i:users) {
@@ -59,14 +59,14 @@ public class UserManager {
 	}
 
 	public void updateEmployee(String username, String password, String name, String lastName, Gender gender, LocalDate birthDate, 
-			String phoneNumber, Degree degree, LocalDate employmentDate, double salary) throws Exception
+			String phoneNumber, Degree degree, LocalDate employmentDate, double salary) 
 	{
 		Employee e = null;
 		User a = readUser(username);
 		if (a instanceof Employee) {
 			e = (Employee) a;
 		}else{
-			throw new Exception();
+			throw new RuntimeException();
 		}
 		e.setName(name);
 		e.setLastName(lastName);
@@ -80,14 +80,14 @@ public class UserManager {
 	}
 
 	public void updateGuest(String username, String password, String name, String lastName, Gender gender, LocalDate birthDate, 
-			String phoneNumber) throws Exception
+			String phoneNumber) 
 	{
 		Guest e = null;
 		User a = readUser(username);
 		if (a instanceof Guest) {
 			e = (Guest) a;
 		}else{
-			throw new Exception();
+			throw new RuntimeException();
 		}
 		e.setName(name);
 		e.setLastName(lastName);
@@ -97,7 +97,7 @@ public class UserManager {
 		e.setPassword(password);
 	}
 	
-	public void deleteUser(String username) throws Exception
+	public void deleteUser(String username) 
 	{
 		User e = readUser(username);
 		users.remove(e);

@@ -10,6 +10,7 @@ import entity.Reservation;
 import entity.Room;
 import enums.Extras;
 import enums.ReservationStatus;
+import enums.RoomStatus;
 import enums.RoomType;
 import manage.PricingManager;
 import manage.ReservationManager;
@@ -38,23 +39,21 @@ public class Hotel {
 		return instance;
 	}
 	
-	public ArrayList<String> validateRequest(Request r) {
-		ArrayList<String> available = new ArrayList<String>();
-		String check = null;
-		String ID = null;
+	public ArrayList<Room> validateRequest(Request r) {
+		ArrayList<Room> available = new ArrayList<Room>();
+		Room check = null;
 		LocalDate begin = null;
 		LocalDate end = null;
 		for(Room i:rom.rooms) {
 			if (i.type == r.type) {
-				available.add(i.getRoomNumber());
+				available.add(i);
 			}
 		}
 		for(Reservation i:rem.reservations) {
-			ID = i.getID();
-			check = ID.substring(0, 3);
+			check = i.room;
 			if(available.contains(check)) {
-				begin = LocalDate.parse(ID.substring(4, 14));
-				end = LocalDate.parse(ID.substring(15));
+				begin = i.begin;
+				end = i.end;
 				if(begin.compareTo(r.end) < 0 || end.compareTo(r.begin) > 0) {
 					available.remove(check);
 				}
@@ -86,13 +85,15 @@ public class Hotel {
 			}
 		}
 		double price = applyPricing(r, p);
-		ArrayList<String> available = validateRequest(r); 
-		if(r.status == ReservationStatus.POTVDJENA && available.contains(room.getRoomNumber())) {
+		ArrayList<Room> available = validateRequest(r); 
+		if(r.status == ReservationStatus.POTVDJENA && available.contains(room) && room.status == RoomStatus.SLOBODNA) {
 			rem.createReservation(r, room, price);
+			
 		}
 	}
 	
 	public ArrayList<RoomType> showAvailable(LocalDate begin, LocalDate end) {
+		//ovo može na drugi način kada sobe čuvaju rezervacije
 		ArrayList<RoomType> available = new ArrayList<RoomType>();
 		LocalDate loop = begin;
 		boolean check = true;
@@ -103,7 +104,7 @@ public class Hotel {
 				}
 				check = true;
 				for(Reservation i:rem.reservations) {
-					if (!(r.getRoomNumber().equals(i.getID().substring(0, 3))) || i.end.compareTo(begin) <= 0) {
+					if (!(r.equals(i.room)) || i.end.compareTo(begin) <= 0) {
 						continue;
 					}
 					else if(i.end.compareTo(loop) > 0 && i.begin.compareTo(loop) < 0) {

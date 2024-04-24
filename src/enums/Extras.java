@@ -9,6 +9,8 @@ public enum Extras {
 	TERETANA(5),
 	SLANA_SOBA(6);
 	
+	//PROMENI I OVO!!!!!!!!!!!!
+	
 	int extra;
 	private Extras() {}
 	private Extras(int i) {this.extra = i;}

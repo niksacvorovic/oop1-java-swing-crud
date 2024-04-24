@@ -3,8 +3,11 @@ package manage;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import entity.Administrator;
+import entity.Cleaner;
 import entity.Employee;
 import entity.Guest;
+import entity.Receptioner;
 import entity.User;
 import enums.Degree;
 import enums.Gender;
@@ -27,7 +30,18 @@ public class UserManager {
 				throw new DuplicateIDException();
 			}
 		}
-		Employee a = new Employee(username, password, name, lastName, gender, birthDate, phoneNumber, role, degree, employmentDate, salary);
+		Employee a = null;
+		switch(role) {
+		case ADMINISTRATOR:
+			a = new Administrator(username, password, name, lastName, gender, birthDate, phoneNumber, role, degree, employmentDate, salary);
+			break;
+		case RECEPCIONAR:
+			a = new Receptioner(username, password, name, lastName, gender, birthDate, phoneNumber, role, degree, employmentDate, salary);
+			break;
+		case HIGIJENICAR:
+			a = new Cleaner(username, password, name, lastName, gender, birthDate, phoneNumber, role, degree, employmentDate, salary);
+			break;
+		}
 		users.add(a);
 	}
 	

@@ -11,24 +11,31 @@ import entity.User;
 import enums.ReservationStatus;
 import enums.Extras;
 import enums.RoomType;
-import exceptions.DuplicateIDException;
 import exceptions.NonexistentEntityException;
 
 public class ReservationManager {
 	public ArrayList<Request> requests;
 	public ArrayList<Reservation> reservations;
+	private static Integer requestID;
+	private static Integer reservationID;
+	//pazi da prilikom ucitavanja se dobije najnovija vrednost
 	
 	public ReservationManager() {
 		this.requests = new ArrayList<Request>();
 		this.reservations = new ArrayList<Reservation>();
 	}
 	
-	public void createRequest(String ID, User guest, RoomType type, LocalDate begin, LocalDate end, Extras... params) {
-		for(Request i:requests) {
-			if(i.getID() == ID) {
-				throw new DuplicateIDException();
-			}
-		}
+	public static void setRequestID(String s) {
+		ReservationManager.requestID = Integer.parseInt(s);
+	}
+	
+	public static void setReservationID(String s) {
+		ReservationManager.reservationID = Integer.parseInt(s);
+	}
+	
+	public void createRequest(User guest, RoomType type, LocalDate begin, LocalDate end, Extras... params) {
+		String ID = requestID.toString();
+		requestID ++;
 		if(guest instanceof Guest) {
 			Request r = new Request(ID, (Guest) guest, ReservationStatus.NA_CEKANJU, type, begin, end, params);
 			requests.add(r);
@@ -58,8 +65,10 @@ public class ReservationManager {
 	
 	public void createReservation(Request r, Room room, double price) {
 		Reservation res = new Reservation(r.guest, room, r.begin, r.end, price, r.extras);
-		res.setID();
+		res.setID(reservationID.toString());
+		reservationID ++;
 		reservations.add(res);
+		room.reservations.add(res);
 	}
 	
 	public Reservation readReservation(String ID) {

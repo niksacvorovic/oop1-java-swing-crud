@@ -11,9 +11,14 @@ import exceptions.NonexistentEntityException;
 
 public class PricingManager {
 	public ArrayList<Pricing> pricings;
+	private static Integer pricingID;
 	
 	public PricingManager() {
 		this.pricings = new ArrayList<Pricing>();
+	}
+	
+	public static void setPricingID(String s){
+		PricingManager.pricingID = Integer.parseInt(s);
 	}
 	
 	public void createPricing(double[] prices, LocalDate start, LocalDate end) {
@@ -37,7 +42,8 @@ public class PricingManager {
 			counter++;
 		}
 		Pricing p = new Pricing(start, end, roomPrices, extrasPrices);
-		p.setID();
+		p.setID(pricingID.toString());
+		pricingID ++;
 		pricings.add(p);
 	}
 	
@@ -72,7 +78,6 @@ public class PricingManager {
 		p.endDate = end;
 		p.roomPrices = roomPrices;
 		p.extrasPrices = extrasPrices;
-		p.setID();
 	}
 	public void updatePricing(String ID, double[] prices, LocalDate start, LocalDate end) {
 		Pricing p = readPricing(ID);
@@ -94,7 +99,6 @@ public class PricingManager {
 		p.endDate = end;
 		p.roomPrices = roomPrices;
 		p.extrasPrices = extrasPrices;
-		p.setID();
 	}
 	
 	public void deletePricing(String ID) {

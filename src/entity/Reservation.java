@@ -26,8 +26,8 @@ public class Reservation{
 		return ID;
 	}
 	
-	public void setID() {
-		this.ID = room.getRoomNumber() + "-" + begin.toString() + "-" + end.toString();
+	public void setID(String ID) {
+		this.ID = ID;
 	}
 	
 	@Override
@@ -38,6 +38,5 @@ public class Reservation{
 			str += i.toString() + " ";
 		}
 		return str;
-
 	}
 }

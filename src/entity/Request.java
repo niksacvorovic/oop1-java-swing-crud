@@ -29,6 +29,10 @@ public class Request {
 		return ID;
 	}
 	
+	public void setID(String ID) {
+		this.ID = ID;
+	}
+	
 	@Override
 	public String toString() {
 		String str = "ID: " + this.ID + "\nGost: " + this.guest.getUsername() + "\nStatus: " + this.status.toString() + "\nTip sobe: " + 

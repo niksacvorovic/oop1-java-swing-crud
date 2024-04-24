@@ -6,7 +6,7 @@ import enums.Degree;
 import enums.Gender;
 import enums.Role;
 
-public class Employee extends User {
+public abstract class Employee extends User {
 	protected Role role;
 	protected Degree degree;
 	protected LocalDate employmentDate;

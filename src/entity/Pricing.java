@@ -12,6 +12,9 @@ public class Pricing {
 	public HashMap<RoomType, Double> roomPrices;
 	public HashMap<Extras, Double> extrasPrices;
 	
+	//implementacija cenovnika: cenovnik sadrži samo id i datume, stavke implementiramo kao odvojene objekte koji imaju
+	//u sebi id cenovnika, uslugu i cenu usluge
+	
 	public Pricing(LocalDate start, LocalDate end, HashMap<RoomType, Double> roomPrices, HashMap<Extras, Double> extrasPrices) {
 		this.startDate = start;
 		this.endDate = end;
@@ -23,8 +26,8 @@ public class Pricing {
 		return ID;
 	}
 	
-	public void setID() {
-		ID = startDate.toString() + "-" + endDate.toString(); 
+	public void setID(String ID) {
+		this.ID = ID; 
 	}
 	
 	@Override

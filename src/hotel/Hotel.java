@@ -8,7 +8,6 @@ import entity.Pricing;
 import entity.Request;
 import entity.Reservation;
 import entity.Room;
-import enums.Extras;
 import enums.ReservationStatus;
 import enums.RoomStatus;
 import enums.RoomType;
@@ -67,28 +66,30 @@ public class Hotel {
 		return available;
 	}
 	
-	public double applyPricing(Request r, Pricing p) {
+	public double applyPricing(Request r) {
 		double price = 0;
-		price += p.roomPrices.get(r.type);
-		for(Extras i:r.extras) {
-			price += p.extrasPrices.get(i);
+		Pricing current = null;
+		LocalDate date = r.begin;
+		while(r.end.compareTo(date) >= 0) {
+			for(Pricing p:pm.pricings) {
+				if(date.compareTo(p.startDate) > 0 && date.compareTo(p.endDate) <= 0) {
+					current = p;
+					break;
+				}
+			}
+			price += current.servicePrices.get(r.type.toString());
+			for(String i:r.services) {
+				price += current.servicePrices.get(i);
+			}
 		}
 		return price;
 	}
 	
 	public void checkIn(Request r, Room room)  {
-		LocalDate today = LocalDate.now();
-		Pricing p = null;
-		for(Pricing i:pm.pricings) {
-			if (today.compareTo(i.startDate) >= 0 && today.compareTo(i.endDate) <= 0) {
-				p = i;
-			}
-		}
-		double price = applyPricing(r, p);
+		double price = applyPricing(r);
 		ArrayList<Room> available = validateRequest(r); 
 		if(r.status == ReservationStatus.POTVDJENA && available.contains(room) && room.status == RoomStatus.SLOBODNA) {
 			rem.createReservation(r, room, price);
-			
 		}
 	}
 	

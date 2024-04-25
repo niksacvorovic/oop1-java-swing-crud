@@ -1,8 +1,7 @@
 package entity; 
 
 import java.time.LocalDate;
-
-import enums.Extras;
+import java.util.ArrayList;
 
 public class Reservation{
 	private String ID;
@@ -11,15 +10,15 @@ public class Reservation{
 	public LocalDate begin;
 	public LocalDate end;
 	public double price;
-	public Extras[] extras;
+	public ArrayList<String> services;
 	
-	public Reservation(Guest guest, Room room, LocalDate begin, LocalDate end, double price, Extras... params) {
+	public Reservation(Guest guest, Room room, LocalDate begin, LocalDate end, double price, ArrayList<String> services) {
 		this.guest = guest;
 		this.room = room;
 		this.begin = begin;
 		this.end = end;
 		this.price = price;
-		this.extras = params;
+		this.services = services;
 	}
 	
 	public String getID() {
@@ -34,8 +33,8 @@ public class Reservation{
 	public String toString() {
 		String str = "ID: " + this.ID + "\nGost: " + this.guest.getUsername() + "\nSoba: " + this.room.getRoomNumber() +
 				"\nPočetak: " + this.begin.toString() + "\nKraj: " + this.end.toString() + "\nCena: " + this.price + "\nDodatne usluge: ";
-		for(Extras i:extras) {
-			str += i.toString() + " ";
+		for(String i:services) {
+			str += i + " ";
 		}
 		return str;
 	}

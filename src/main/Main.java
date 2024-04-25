@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 import enums.Degree;
-import enums.Extras;
 import enums.Gender;
 import enums.Role;
 import enums.RoomType;
@@ -39,26 +38,30 @@ public class Main {
 		System.out.println("Posle izmene sobe:");
 		System.out.println(hotel.rom.readRoom("102").toString());
 		System.out.println();
-		/* Dodatne usluge su implementirane kao enumeracije, zato što ne sadrže nikakav dodatni podatak osim svog
-		   imena. Ovime postižemo jednostavniju implmentaciju (npr. na formi se sve dodatne usluge mogu dodati checkboxom)
-		   Mana ovog pristupa je što se dodatne usluge ne mogu dinamički dodati u sistem, već je potrebno urediti fajlove.
-		 */
-		double[] prices = {25, 35, 40, 45, 50, 6, 10, 8, 12, 15, 10, 8};
-		hotel.pm.createPricing(prices, LocalDate.parse("2024-01-01"), LocalDate.parse("2024-12-13"));
+		hotel.pm.services.add("Doručak");
+		hotel.pm.services.add("Ručak");
+		hotel.pm.services.add("Večera");
+		hotel.pm.services.add("Bazen");
+		hotel.pm.services.add("Spa centar");
+		double[] prices = {25, 35, 40, 45, 50, 6, 10, 8, 12, 15};
+		hotel.pm.createPricing(LocalDate.parse("2024-01-01"), LocalDate.parse("2024-12-13"), prices);
 		System.out.println("Pre izmene cenovnika:");
 		System.out.println(hotel.pm.readPricing("0").toString());
-		hotel.pm.updateOnePrice("0", Extras.DORUCAK, 30.0);
+		hotel.pm.updateOnePrice("0", "Doručak", 30.0);
 		System.out.println("Posle izmene cenovnika:");
 		System.out.println(hotel.pm.readPricing("0").toString());
 		System.out.println();
 		System.out.println("Prikaz dostupnih soba:");
 		ArrayList<RoomType> a = hotel.showAvailable(LocalDate.parse("2024-08-01"), LocalDate.parse("2024-08-31"));
 		for(RoomType i:a) {System.out.println(i.toString());}
+		ArrayList<String> services = new ArrayList<String>();
+		services.add("Doručak");
+		services.add("Večera");
 		hotel.rem.createRequest(hotel.um.readUser("milicamilic@gmail.com"), RoomType.TROKREVETNA_BRACNI, 
-				LocalDate.parse("2024-08-13"), LocalDate.parse("2024-08-23"), Extras.DORUCAK, Extras.VECERA);
+				LocalDate.parse("2024-08-13"), LocalDate.parse("2024-08-23"), services);
 		hotel.showAvailable(LocalDate.parse("2024-06-01"), LocalDate.parse("2024-06-30"));
 		hotel.rem.createRequest(hotel.um.readUser("anaanic@gmail.com"), RoomType.DVOKREVETNA, LocalDate.parse("2024-06-06"),
-				LocalDate.parse("2024-06-12"), Extras.DORUCAK, Extras.VECERA);
+				LocalDate.parse("2024-06-12"), services);
 		System.out.println();
 		System.out.println("Prikaz unosa jednog gosta: ");
 		ArrayList <Object> b = hotel.showGuestInputs("milicamilic@gmail.com");

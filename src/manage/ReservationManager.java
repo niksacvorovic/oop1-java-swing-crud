@@ -9,7 +9,6 @@ import entity.Reservation;
 import entity.Room;
 import entity.User;
 import enums.ReservationStatus;
-import enums.Extras;
 import enums.RoomType;
 import exceptions.NonexistentEntityException;
 
@@ -33,11 +32,11 @@ public class ReservationManager {
 		ReservationManager.reservationID = Integer.parseInt(s);
 	}
 	
-	public void createRequest(User guest, RoomType type, LocalDate begin, LocalDate end, Extras... params) {
+	public void createRequest(User guest, RoomType type, LocalDate begin, LocalDate end, ArrayList<String> services) {
 		String ID = requestID.toString();
 		requestID ++;
 		if(guest instanceof Guest) {
-			Request r = new Request(ID, (Guest) guest, ReservationStatus.NA_CEKANJU, type, begin, end, params);
+			Request r = new Request(ID, (Guest) guest, ReservationStatus.NA_CEKANJU, type, begin, end, services);
 			requests.add(r);
 		}else{
 			throw new RuntimeException();
@@ -64,7 +63,7 @@ public class ReservationManager {
 	}
 	
 	public void createReservation(Request r, Room room, double price) {
-		Reservation res = new Reservation(r.guest, room, r.begin, r.end, price, r.extras);
+		Reservation res = new Reservation(r.guest, room, r.begin, r.end, price, r.services);
 		res.setID(reservationID.toString());
 		reservationID ++;
 		reservations.add(res);
@@ -86,14 +85,15 @@ public class ReservationManager {
 
 	}
 	
-	public void updateReservation(String ID, Guest guest, Room room, LocalDate begin, LocalDate end, double price, Extras... params)  {
+	public void updateReservation(String ID, Guest guest, Room room, LocalDate begin, LocalDate end, double price, 
+			ArrayList<String> services)  {
 		Reservation r = readReservation(ID);
 		r.guest = guest;
 		r.room = room;
 		r.begin = begin;
 		r.end = end;
 		r.price = price;
-		r.extras = params;
+		r.services = services;
 	}
 	
 	public void deleteReservation(String ID) {

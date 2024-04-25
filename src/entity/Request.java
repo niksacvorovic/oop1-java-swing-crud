@@ -1,8 +1,8 @@
 package entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
-import enums.Extras;
 import enums.ReservationStatus;
 import enums.RoomType;
 
@@ -13,16 +13,17 @@ public class Request {
 	public RoomType type;
 	public LocalDate begin;
 	public LocalDate end;
-	public Extras[] extras;
+	public ArrayList<String> services;
 	
-	public Request(String ID, Guest guest, ReservationStatus status, RoomType type, LocalDate begin, LocalDate end, Extras... params) {
+	public Request(String ID, Guest guest, ReservationStatus status, RoomType type, LocalDate begin, LocalDate end, 
+			ArrayList<String> services) {
 		this.ID = ID;
 		this.guest = guest;
 		this.status = status;
 		this.type = type;
 		this.begin = begin;
 		this.end = end;
-		this.extras = params;
+		this.services = services;
 	}
 
 	public String getID() {
@@ -37,8 +38,8 @@ public class Request {
 	public String toString() {
 		String str = "ID: " + this.ID + "\nGost: " + this.guest.getUsername() + "\nStatus: " + this.status.toString() + "\nTip sobe: " + 
 				this.type.toString() + "\nPočetak: " + this.begin.toString() + "\nKraj: " + this.end.toString() + "\nDodatne usluge: ";
-		for(Extras i:extras) {
-			str += i.toString() + " ";
+		for(String i:services) {
+			str += i + " ";
 		}
 		return str;
 	}

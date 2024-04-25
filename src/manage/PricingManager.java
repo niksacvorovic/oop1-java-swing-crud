@@ -5,45 +5,38 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import entity.Pricing;
-import enums.Extras;
 import enums.RoomType;
 import exceptions.NonexistentEntityException;
 
 public class PricingManager {
 	public ArrayList<Pricing> pricings;
+	public ArrayList<String> services;
 	private static Integer pricingID;
 	
 	public PricingManager() {
 		this.pricings = new ArrayList<Pricing>();
+		this.services = new ArrayList<String>();
+		for(RoomType i:RoomType.values()) {
+			services.add(i.toString());
+		}
 	}
 	
 	public static void setPricingID(String s){
 		PricingManager.pricingID = Integer.parseInt(s);
 	}
 	
-	public void createPricing(double[] prices, LocalDate start, LocalDate end) {
-		for(Pricing i:pricings) {
-			if (!((i.startDate.compareTo(end) > 0) || (i.endDate.compareTo(start) < 0))) {
-				throw new RuntimeException();
-			}
-		}
-		int counter = 0;
-		if (prices.length != 12) {
+	public void createPricing(LocalDate start, LocalDate end, double... params) {
+		if (params.length != services.size()) {
 			throw new RuntimeException();
 		}
-		HashMap<RoomType, Double> roomPrices = new HashMap<RoomType, Double>();
-		HashMap<Extras, Double> extrasPrices = new HashMap<Extras, Double>();
-		for(RoomType e:RoomType.values()) {
-			roomPrices.put(e, prices[counter]);
-			counter++;
-		}
-		for(Extras e:Extras.values()) {
-			extrasPrices.put(e, prices[counter]);
-			counter++;
-		}
-		Pricing p = new Pricing(start, end, roomPrices, extrasPrices);
+		HashMap<String, Double> servicePrices = new HashMap<String, Double>();
+		Pricing p = new Pricing(start, end, servicePrices);
 		p.setID(pricingID.toString());
-		pricingID ++;
+		pricingID++;
+		for(int i = 0; i < services.size(); i++) {
+			servicePrices.put(services.get(i), params[i]);
+		}
+		//deljenje cenovnika ako se doda jedan preko drugog
 		pricings.add(p);
 	}
 	
@@ -61,44 +54,16 @@ public class PricingManager {
 		return p;
 	}
 	
-	public void updateOnePrice(String ID, RoomType room, double price)  {
+	public void updateOnePrice(String ID, String service, double price)  {
 		Pricing p = readPricing(ID);
-		p.roomPrices.replace(room, price);
+		p.servicePrices.replace(service, price);
 	}
-	
-	public void updateOnePrice(String ID, Extras extra, double price)  {
-		Pricing p = readPricing(ID);
-		p.extrasPrices.replace(extra, price);
-	}
-	
-	public void updatePricing(String ID, LocalDate start, LocalDate end, HashMap<RoomType, Double> roomPrices, 
-			HashMap<Extras, Double> extrasPrices) {
+		
+	public void updatePricing(String ID, LocalDate start, LocalDate end, HashMap<String, Double> servicePrices) {
 		Pricing p = readPricing(ID);
 		p.startDate = start;
 		p.endDate = end;
-		p.roomPrices = roomPrices;
-		p.extrasPrices = extrasPrices;
-	}
-	public void updatePricing(String ID, double[] prices, LocalDate start, LocalDate end) {
-		Pricing p = readPricing(ID);
-		int counter = 0;
-		if (prices.length != 12) {
-			throw new RuntimeException();
-		}
-		HashMap<RoomType, Double> roomPrices = new HashMap<RoomType, Double>();
-		HashMap<Extras, Double> extrasPrices = new HashMap<Extras, Double>();
-		for(RoomType e:RoomType.values()) {
-			roomPrices.put(e, prices[counter]);
-			counter++;
-		}
-		for(Extras e:Extras.values()) {
-			extrasPrices.put(e, prices[counter]);
-			counter++;
-		}
-		p.startDate = start;
-		p.endDate = end;
-		p.roomPrices = roomPrices;
-		p.extrasPrices = extrasPrices;
+		p.servicePrices = servicePrices;
 	}
 	
 	public void deletePricing(String ID) {

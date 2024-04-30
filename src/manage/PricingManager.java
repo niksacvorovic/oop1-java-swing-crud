@@ -36,7 +36,18 @@ public class PricingManager {
 		for(int i = 0; i < services.size(); i++) {
 			servicePrices.put(services.get(i), params[i]);
 		}
-		//deljenje cenovnika ako se doda jedan preko drugog
+		for(Pricing i:pricings) {
+			if(p.startDate.compareTo(i.startDate) > 0 && p.endDate.compareTo(i.endDate) < 0) {
+				Pricing split = new Pricing(i);
+				split.startDate = p.endDate;
+				i.endDate = p.startDate;
+				pricings.add(split);
+			}else if(i.endDate.compareTo(p.startDate) > 0 && i.endDate.compareTo(p.endDate) < 0) {
+				i.endDate = p.startDate;
+			}else if(i.startDate.compareTo(p.startDate) > 0 && i.startDate.compareTo(p.endDate) < 0) {
+				i.startDate = p.endDate;
+			}
+		}
 		pricings.add(p);
 	}
 	

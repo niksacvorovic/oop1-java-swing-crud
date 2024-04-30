@@ -94,7 +94,6 @@ public class Hotel {
 	}
 	
 	public ArrayList<RoomType> showAvailable(LocalDate begin, LocalDate end) {
-		//ovo može na drugi način kada sobe čuvaju rezervacije
 		ArrayList<RoomType> available = new ArrayList<RoomType>();
 		LocalDate loop = begin;
 		boolean check = true;
@@ -104,12 +103,10 @@ public class Hotel {
 					continue;
 				}
 				check = true;
-				for(Reservation i:rem.reservations) {
-					if (!(r.equals(i.room)) || i.end.compareTo(begin) <= 0) {
-						continue;
-					}
-					else if(i.end.compareTo(loop) > 0 && i.begin.compareTo(loop) < 0) {
+				for(Reservation i:r.reservations) {
+					if(i.end.compareTo(loop) > 0 && i.begin.compareTo(loop) < 0) {
 						check = false;
+						break;
 					}
 				}
 				if(check == true) {

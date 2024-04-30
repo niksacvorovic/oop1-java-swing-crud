@@ -13,7 +13,12 @@ public class Pricing {
 		this.startDate = start;
 		this.endDate = end;
 		this.servicePrices = servicePrices;
-
+	}
+	
+	public Pricing(Pricing p) {
+		this.startDate = p.startDate;
+		this.endDate = p.endDate;
+		this.servicePrices = p.servicePrices;
 	}
 	
 	public String getID() {

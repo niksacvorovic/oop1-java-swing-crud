@@ -1,5 +1,8 @@
 package manage;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,14 +28,32 @@ public class PricingManager {
 		PricingManager.pricingID = Integer.parseInt(s);
 	}
 	
+	public void saveData() {
+		ArrayList<String> buffer = new ArrayList<String>();
+		String sep = System.getProperty("file.separator");
+		for(Pricing i:pricings) {
+			String save = i.getID() + "," + i.startDate.toString() + "," + i.endDate.toString();
+			StringBuilder sb = new StringBuilder(save);
+			i.servicePrices.forEach((key, value) -> {
+				sb.append("," + key + "-" + Double.toString(value));
+			});
+			buffer.add(sb.toString());
+		}
+		try {
+			Files.write(Paths.get("." + sep + "data" + sep + "pricings.csv"), buffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void createPricing(LocalDate start, LocalDate end, double... params) {
 		if (params.length != services.size()) {
 			throw new RuntimeException();
 		}
 		HashMap<String, Double> servicePrices = new HashMap<String, Double>();
-		Pricing p = new Pricing(start, end, servicePrices);
-		p.setID(pricingID.toString());
+		String ID = pricingID.toString();
 		pricingID++;
+		Pricing p = new Pricing(ID, start, end, servicePrices);
 		for(int i = 0; i < services.size(); i++) {
 			servicePrices.put(services.get(i), params[i]);
 		}

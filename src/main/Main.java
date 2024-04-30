@@ -66,5 +66,6 @@ public class Main {
 		System.out.println("Prikaz unosa jednog gosta: ");
 		ArrayList <Object> b = hotel.showGuestInputs("milicamilic@gmail.com");
 		for(Object i:b) {System.out.println(i.toString());}
+		hotel.saveData();
 		}
 }

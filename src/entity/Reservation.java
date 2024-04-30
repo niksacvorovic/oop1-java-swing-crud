@@ -12,7 +12,8 @@ public class Reservation{
 	public double price;
 	public ArrayList<String> services;
 	
-	public Reservation(Guest guest, Room room, LocalDate begin, LocalDate end, double price, ArrayList<String> services) {
+	public Reservation(String ID, Guest guest, Room room, LocalDate begin, LocalDate end, double price, ArrayList<String> services) {
+		this.ID = ID;
 		this.guest = guest;
 		this.room = room;
 		this.begin = begin;

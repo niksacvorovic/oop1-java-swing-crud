@@ -1,5 +1,8 @@
 package manage;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -21,12 +24,33 @@ public class UserManager {
 	public UserManager() {
 		this.users = new ArrayList<User>();
 	}
-
+	
+	public void saveData() {
+		String sep = System.getProperty("file.separator");
+		ArrayList<String> buffer = new ArrayList<String>();
+		for(User i:users) {
+			if(i instanceof Guest) {
+				buffer.add(i.getUsername() + "," + i.getPassword() + "," + i.getName() + "," + i.getLastName() + "," + i.getGender().name()
+						+ "," + i.getBirthDate().toString() + "," + i.getPhoneNumber());
+			}else{
+				Employee j = (Employee) i;
+				buffer.add(j.getUsername() + "," + j.getPassword() + "," + j.getName() + "," + j.getLastName() + "," + j.getGender().name()
+						+ "," + j.getBirthDate().toString() + "," + j.getPhoneNumber() + "," + j.getRole().name() + "," +
+						j.getDegree().name() + "," + j.getEmploymentDate().toString() + "," + Double.toString(j.getBaseSalary()));
+			}
+		}
+		try {
+			Files.write(Paths.get("." + sep + "data" + sep + "users.csv"), buffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void createEmployee(String username, String password, String name, String lastName, Gender gender, LocalDate birthDate, 
 			String phoneNumber, Role role, Degree degree, LocalDate employmentDate, double salary) 
 	{
 		for(User i:users) {
-			if (i.getUsername() == username) {
+			if (i.getUsername().equals(username)) {
 				throw new DuplicateIDException();
 			}
 		}

@@ -1,5 +1,8 @@
 package manage;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import entity.Room;
@@ -15,9 +18,22 @@ public class RoomManager {
 		this.rooms = new ArrayList<Room>();
 	}
 	
+	public void saveData() {
+		String sep = System.getProperty("file.separator");
+		ArrayList<String> buffer = new ArrayList<String>();
+		for(Room r:rooms) {
+			buffer.add(r.getRoomNumber() + "," + r.type.name() + "," + r.status.name());
+		}
+		try {
+			Files.write(Paths.get("." + sep + "data" + sep + "rooms.csv"), buffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void createRoom(String roomNumber, RoomType type)  {
 		for(Room i:rooms) {
-			if(i.getRoomNumber() == roomNumber) {
+			if(i.getRoomNumber().equals(roomNumber)) {
 				throw new DuplicateIDException();
 			}
 		}

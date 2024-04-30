@@ -9,7 +9,8 @@ public class Pricing {
 	public LocalDate endDate;
 	public HashMap<String, Double> servicePrices;
 	
-	public Pricing(LocalDate start, LocalDate end, HashMap<String, Double> servicePrices) {
+	public Pricing(String ID, LocalDate start, LocalDate end, HashMap<String, Double> servicePrices) {
+		this.ID = ID;
 		this.startDate = start;
 		this.endDate = end;
 		this.servicePrices = servicePrices;

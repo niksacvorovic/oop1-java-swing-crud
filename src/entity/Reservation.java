@@ -39,4 +39,13 @@ public class Reservation{
 		}
 		return str;
 	}
+	
+	public String toFileString() {
+		String save = this.getID() + "," + this.guest.getUsername() + "," + this.room.getRoomNumber() + "," + this.begin.toString() + "," + 
+				this.end.toString() + "," + Double.toString(this.price);
+		for(String s:this.services) {
+			save += "," + s;
+		}
+		return save;
+	}
 }

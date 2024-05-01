@@ -43,4 +43,13 @@ public class Request {
 		}
 		return str;
 	}
+	
+	public String toFileString() {
+		String save = this.getID() + "," + this.guest.getUsername() + "," + this.status.name() + "," + this.type.name() + "," + 
+				this.begin.toString() + "," + this.end.toString();
+		for(String s:this.services) {
+			save += "," + s;
+		}
+		return save;
+	}
 }

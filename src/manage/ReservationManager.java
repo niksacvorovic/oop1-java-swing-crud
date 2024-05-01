@@ -10,7 +10,6 @@ import entity.Guest;
 import entity.Request;
 import entity.Reservation;
 import entity.Room;
-import entity.User;
 import enums.ReservationStatus;
 import enums.RoomType;
 import exceptions.NonexistentEntityException;
@@ -26,6 +25,14 @@ public class ReservationManager {
 		this.reservations = new ArrayList<Reservation>();
 	}
 	
+	public static String getRequestID() {
+		return requestID.toString();
+	}
+	
+	public static String getReservationID() {
+		return reservationID.toString();
+	}
+	
 	public static void setRequestID(String s) {
 		ReservationManager.requestID = Integer.parseInt(s);
 	}
@@ -39,20 +46,11 @@ public class ReservationManager {
 		ArrayList<String> resbuffer = new ArrayList<String>();
 		String sep = System.getProperty("file.separator");
 		for(Request i:requests) {
-			String save = i.getID() + "," + i.guest.getUsername() + "," + i.status.name() + "," + i.type.name() + "," + i.begin.toString() +
-					"," + i.end.toString();
-			for(String s:i.services) {
-				save += "," + s;
-			}
-			reqbuffer.add(save);
+			reqbuffer.add(i.toFileString());
 		}
 		for(Reservation i: reservations) {
-			String save = i.getID() + "," + i.guest.getUsername() + "," + i.room.getRoomNumber() + "," + i.begin.toString() + "," + 
-					i.end.toString() + "," + Double.toString(i.price);
-			for(String s:i.services) {
-				save += "," + s;
-			}
-			resbuffer.add(save);
+			
+			resbuffer.add(i.toFileString());
 		}
 		try {
 			Files.write(Paths.get("." + sep + "data" + sep + "requests.csv"), reqbuffer);
@@ -62,15 +60,12 @@ public class ReservationManager {
 		}
 	}
 	
-	public void createRequest(User guest, RoomType type, LocalDate begin, LocalDate end, ArrayList<String> services) {
+	public void createRequest(Guest guest, RoomType type, LocalDate begin, LocalDate end, ArrayList<String> services) {
 		String ID = requestID.toString();
 		requestID ++;
-		if(guest instanceof Guest) {
-			Request r = new Request(ID, (Guest) guest, ReservationStatus.NA_CEKANJU, type, begin, end, services);
-			requests.add(r);
-		}else{
-			throw new RuntimeException();
-		}
+		Request r = new Request(ID, guest, ReservationStatus.NA_CEKANJU, type, begin, end, services);
+		guest.userInputs.add(r);
+		requests.add(r);
 	}
 	
 	public Request readRequest(String ID) {
@@ -96,6 +91,8 @@ public class ReservationManager {
 		String ID = reservationID.toString();
 		reservationID ++;
 		Reservation res = new Reservation(ID, r.guest, room, r.begin, r.end, price, r.services);
+		r.guest.userInputs.remove(r);
+		r.guest.userInputs.add(res);
 		reservations.add(res);
 		room.reservations.add(res);
 	}

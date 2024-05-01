@@ -22,7 +22,7 @@ public class RoomManager {
 		String sep = System.getProperty("file.separator");
 		ArrayList<String> buffer = new ArrayList<String>();
 		for(Room r:rooms) {
-			buffer.add(r.getRoomNumber() + "," + r.type.name() + "," + r.status.name());
+			buffer.add(r.toFileString());
 		}
 		try {
 			Files.write(Paths.get("." + sep + "data" + sep + "rooms.csv"), buffer);
@@ -37,7 +37,7 @@ public class RoomManager {
 				throw new DuplicateIDException();
 			}
 		}
-		Room r = new Room(roomNumber, type, RoomStatus.SLOBODNA);
+		Room r = new Room(roomNumber, type, RoomStatus.SLOBODNA, null);
 		rooms.add(r);
 	}
 	

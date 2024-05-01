@@ -61,4 +61,11 @@ public abstract class Employee extends User {
 				+ this.employmentDate.toString() + "\nOsnova plate: " + this.baseSalary;
 		return str;
 	}
+	
+	@Override
+	public String toFileString() {
+		return this.getUsername() + "," + this.getPassword() + "," + this.getName() + "," + this.getLastName() + "," + this.getGender().name()
+				+ "," + this.getBirthDate().toString() + "," + this.getPhoneNumber() + "," + this.getRole().name() + "," +
+				this.getDegree().name() + "," + this.getEmploymentDate().toString() + "," + Double.toString(this.getBaseSalary());
+	}
 }

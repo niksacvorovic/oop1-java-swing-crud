@@ -14,14 +14,20 @@ import exceptions.NonexistentEntityException;
 public class PricingManager {
 	public ArrayList<Pricing> pricings;
 	public ArrayList<String> services;
+	public ArrayList<String> roomTypes;
 	private static Integer pricingID;
 	
 	public PricingManager() {
 		this.pricings = new ArrayList<Pricing>();
 		this.services = new ArrayList<String>();
+		this.roomTypes = new ArrayList<String>();
 		for(RoomType i:RoomType.values()) {
-			services.add(i.toString());
+			roomTypes.add(i.toString());
 		}
+	}
+	
+	public static String getPricingID() {
+		return pricingID.toString();
 	}
 	
 	public static void setPricingID(String s){
@@ -32,12 +38,7 @@ public class PricingManager {
 		ArrayList<String> buffer = new ArrayList<String>();
 		String sep = System.getProperty("file.separator");
 		for(Pricing i:pricings) {
-			String save = i.getID() + "," + i.startDate.toString() + "," + i.endDate.toString();
-			StringBuilder sb = new StringBuilder(save);
-			i.servicePrices.forEach((key, value) -> {
-				sb.append("," + key + "-" + Double.toString(value));
-			});
-			buffer.add(sb.toString());
+			buffer.add(i.toFileString());
 		}
 		try {
 			Files.write(Paths.get("." + sep + "data" + sep + "pricings.csv"), buffer);
@@ -47,15 +48,18 @@ public class PricingManager {
 	}
 	
 	public void createPricing(LocalDate start, LocalDate end, double... params) {
-		if (params.length != services.size()) {
+		if (params.length != roomTypes.size() + services.size()) {
 			throw new RuntimeException();
 		}
 		HashMap<String, Double> servicePrices = new HashMap<String, Double>();
 		String ID = pricingID.toString();
 		pricingID++;
 		Pricing p = new Pricing(ID, start, end, servicePrices);
-		for(int i = 0; i < services.size(); i++) {
-			servicePrices.put(services.get(i), params[i]);
+		for(int i = 0; i < roomTypes.size(); i++) {
+			servicePrices.put(roomTypes.get(i), params[i]);
+		}
+		for(int i = roomTypes.size(); i < roomTypes.size() + services.size(); i++) {
+			servicePrices.put(services.get(i - roomTypes.size()), params[i]);
 		}
 		for(Pricing i:pricings) {
 			if(p.startDate.compareTo(i.startDate) > 0 && p.endDate.compareTo(i.endDate) < 0) {

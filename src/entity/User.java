@@ -75,4 +75,9 @@ public abstract class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	
+	public String toFileString() {
+		return this.getUsername() + "," + this.getPassword() + "," + this.getName() + "," + this.getLastName() + "," + this.getGender().name()
+				+ "," + this.getBirthDate().toString() + "," + this.getPhoneNumber();
+	}
 }

@@ -20,9 +20,11 @@ import exceptions.NonexistentEntityException;
 
 public class UserManager {
 	public ArrayList<User> users;
+	public ArrayList<Employee> employees;
 	
 	public UserManager() {
 		this.users = new ArrayList<User>();
+		this.employees = new ArrayList<Employee>();
 	}
 	
 	public void saveData() {
@@ -30,13 +32,10 @@ public class UserManager {
 		ArrayList<String> buffer = new ArrayList<String>();
 		for(User i:users) {
 			if(i instanceof Guest) {
-				buffer.add(i.getUsername() + "," + i.getPassword() + "," + i.getName() + "," + i.getLastName() + "," + i.getGender().name()
-						+ "," + i.getBirthDate().toString() + "," + i.getPhoneNumber());
+				buffer.add(i.toFileString());
 			}else{
 				Employee j = (Employee) i;
-				buffer.add(j.getUsername() + "," + j.getPassword() + "," + j.getName() + "," + j.getLastName() + "," + j.getGender().name()
-						+ "," + j.getBirthDate().toString() + "," + j.getPhoneNumber() + "," + j.getRole().name() + "," +
-						j.getDegree().name() + "," + j.getEmploymentDate().toString() + "," + Double.toString(j.getBaseSalary()));
+				buffer.add(j.toFileString());
 			}
 		}
 		try {
@@ -66,6 +65,7 @@ public class UserManager {
 			a = new Cleaner(username, password, name, lastName, gender, birthDate, phoneNumber, role, degree, employmentDate, salary);
 			break;
 		}
+		employees.add(a);
 		users.add(a);
 	}
 	

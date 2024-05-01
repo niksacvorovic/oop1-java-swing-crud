@@ -1,7 +1,5 @@
 package hotel;
 
-import java.io.FileOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -12,6 +10,7 @@ import java.util.List;
 
 import entity.Administrator;
 import entity.Cleaner;
+import entity.Employee;
 import entity.Guest;
 import entity.Pricing;
 import entity.Receptioner;
@@ -56,6 +55,7 @@ public class Hotel {
 	public void loadData() {
 		String sep = System.getProperty("file.separator");
 		try {
+			//učitavanje korisnika
 			List<String> userData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "users.csv"));
 			for(String i:userData) {
 				String data[] = i.split(",");
@@ -82,15 +82,24 @@ public class Hotel {
 								Double.parseDouble(data[10]));
 						break;
 					}
+					um.employees.add((Employee) e);
 				}
 				um.users.add(e);
 			}
+			//učitavanje soba
 			List<String> roomData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "rooms.csv"));
 			for(String i:roomData) {
 				String data[] = i.split(",");
-				Room r = new Room(data[0], RoomType.valueOf(data[1]), RoomStatus.valueOf(data[2]));
+				Room r = null;
+				if(data.length == 3) {
+					r = new Room(data[0], RoomType.valueOf(data[1]), RoomStatus.valueOf(data[2]), null);
+				}else{
+					r = new Room(data[0], RoomType.valueOf(data[1]), RoomStatus.valueOf(data[2]), (Cleaner) um.readUser(data[3]));
+					r.cleaner.rooms.add(r);
+				}
 				rom.rooms.add(r);
 			}
+			//učitavanje zahteva
 			List<String> requestData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "requests.csv"));
 			for(String i:requestData) {
 				String data[] = i.split(",");
@@ -99,8 +108,10 @@ public class Hotel {
 				for(int j = 0; j + 6 < data.length; j++) {
 					r.services.add(data[j + 6]);
 				}
+				r.guest.userInputs.add(r);
 				rem.requests.add(r);
 			}
+			//učitavanje rezervacija
 			List<String> reservationData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "reservations.csv"));
 			for(String i:reservationData) {
 				String data[] = i.split(",");
@@ -109,8 +120,11 @@ public class Hotel {
 				for(int j = 0; j + 6 < data.length; j++) {
 					r.services.add(data[j + 6]);
 				}
+				r.guest.userInputs.add(r);
+				r.room.reservations.add(r);
 				rem.reservations.add(r);
 			}
+			//učitavanje cenovnika
 			List<String> pricingData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "pricings.csv"));
 			for(String i:pricingData) {
 				String data[] = i.split(",");
@@ -121,11 +135,17 @@ public class Hotel {
 				}
 				pm.pricings.add(p);
 			}
-			new FileOutputStream(new File("." + sep + "data" + sep + "users.csv")).close();
-			new FileOutputStream(new File("." + sep + "data" + sep + "rooms.csv")).close();
-			new FileOutputStream(new File("." + sep + "data" + sep + "requests.csv")).close();
-			new FileOutputStream(new File("." + sep + "data" + sep + "reservations.csv")).close();
-			new FileOutputStream(new File("." + sep + "data" + sep + "pricings.csv")).close();
+			//učitavanje ostalog 
+			List<String> miscData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "misc.csv"));
+			if(miscData.size() == 2){
+				for(String i:miscData.get(0).split(",")) {
+					pm.services.add(i);
+				}
+				String ids[] = miscData.get(1).split(",");
+				ReservationManager.setRequestID(ids[0]);
+				ReservationManager.setReservationID(ids[1]);
+				PricingManager.setPricingID(ids[2]);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -136,6 +156,24 @@ public class Hotel {
 		rom.saveData();
 		rem.saveData();
 		pm.saveData();
+		saveMisc();
+	}
+	
+	public void saveMisc() {
+		String sep = System.getProperty("file.separator");
+		ArrayList<String> buffer = new ArrayList<String>();
+		String services = "";
+		for(String i:pm.services) {
+			services += i + ",";
+		}
+		services = services.substring(0, services.length() - 1);
+		buffer.add(services);
+		buffer.add(ReservationManager.getRequestID() + "," + ReservationManager.getReservationID() + "," + PricingManager.getPricingID());
+		try {
+			Files.write(Paths.get("." + sep + "data" + sep + "misc.csv"), buffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public ArrayList<Room> validateRequest(Request r) {
 		ArrayList<Room> available = new ArrayList<Room>();
@@ -188,8 +226,32 @@ public class Hotel {
 		double price = applyPricing(r);
 		ArrayList<Room> available = validateRequest(r); 
 		if(r.status == ReservationStatus.POTVDJENA && available.contains(room) && room.status == RoomStatus.SLOBODNA) {
+			room.status = RoomStatus.ZAUZETA;
 			rem.createReservation(r, room, price);
+			rem.requests.remove(r);
 		}
+	}
+	
+	public void checkOut(Reservation r) {
+		r.room.status = RoomStatus.SPREMANJE;
+		Cleaner next = null;
+		Cleaner newcleaner = null;
+		int min = 1000;
+		for(Employee i:um.employees) {
+			if (i instanceof Cleaner) {
+				next = (Cleaner) i;
+				if(next.rooms.size() == 0) {
+					newcleaner = next;
+					break;
+				}
+				if(next.rooms.size() < min) {
+					newcleaner = next;
+					min = next.rooms.size();
+				}
+			}
+		}
+		r.room.cleaner = newcleaner;
+		newcleaner.rooms.add(r.room);
 	}
 	
 	public ArrayList<RoomType> showAvailable(LocalDate begin, LocalDate end) {
@@ -218,18 +280,7 @@ public class Hotel {
 	}
 	
 	public ArrayList<Object> showGuestInputs(String username){
-		ArrayList<Object> ret = new ArrayList<Object>();
 		Guest guest = (Guest) um.readUser(username);
-		for(Request i:rem.requests) {
-			if (i.guest.equals(guest)) {
-				ret.add(i);
-			}
-		}
-		for(Reservation i:rem.reservations) {
-			if (i.guest.equals(guest)) {
-				ret.add(i);
-			}
-		}
-		return ret;
+		return guest.userInputs;
 	}
 }

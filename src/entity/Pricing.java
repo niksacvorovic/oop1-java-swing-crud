@@ -39,4 +39,13 @@ public class Pricing {
 		});
 		return sb.toString();
 	}
+	
+	public String toFileString() {
+		String save = this.getID() + "," + this.startDate.toString() + "," + this.endDate.toString();
+		StringBuilder sb = new StringBuilder(save);
+		this.servicePrices.forEach((key, value) -> {
+			sb.append("," + key + "-" + Double.toString(value));
+		});
+		return sb.toString();
+	}
 }

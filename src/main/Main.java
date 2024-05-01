@@ -3,6 +3,9 @@ package main;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import entity.Guest;
+import entity.Request;
+import entity.Reservation;
 import enums.Degree;
 import enums.Gender;
 import enums.Role;
@@ -57,15 +60,23 @@ public class Main {
 		ArrayList<String> services = new ArrayList<String>();
 		services.add("Doručak");
 		services.add("Večera");
-		hotel.rem.createRequest(hotel.um.readUser("milicamilic@gmail.com"), RoomType.TROKREVETNA_BRACNI, 
+		hotel.rem.createRequest((Guest) hotel.um.readUser("milicamilic@gmail.com"), RoomType.TROKREVETNA_BRACNI, 
 				LocalDate.parse("2024-08-13"), LocalDate.parse("2024-08-23"), services);
 		hotel.showAvailable(LocalDate.parse("2024-06-01"), LocalDate.parse("2024-06-30"));
-		hotel.rem.createRequest(hotel.um.readUser("anaanic@gmail.com"), RoomType.DVOKREVETNA, LocalDate.parse("2024-06-06"),
+		hotel.rem.createRequest((Guest) hotel.um.readUser("anaanic@gmail.com"), RoomType.DVOKREVETNA, LocalDate.parse("2024-06-06"),
 				LocalDate.parse("2024-06-12"), services);
 		System.out.println();
 		System.out.println("Prikaz unosa jednog gosta: ");
 		ArrayList <Object> b = hotel.showGuestInputs("milicamilic@gmail.com");
-		for(Object i:b) {System.out.println(i.toString());}
+		for(Object i:b) {
+			if(i instanceof Request) {
+				Request j = (Request) i;
+				System.out.println(j.toString());
+			}else {
+				Reservation j = (Reservation) i;
+				System.out.println(j.toString());
+			}
+		}
 		hotel.saveData();
 		}
 }

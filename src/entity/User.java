@@ -80,4 +80,10 @@ public abstract class User {
 		return this.getUsername() + "," + this.getPassword() + "," + this.getName() + "," + this.getLastName() + "," + this.getGender().name()
 				+ "," + this.getBirthDate().toString() + "," + this.getPhoneNumber();
 	}
+	
+	public Object[] toCell() {
+		Object data[] = {this.getUsername(), this.getPassword(), this.getName(), this.getLastName(), this.getGender(), this.getBirthDate(),
+		        this.getPhoneNumber()};
+		return data;
+	}
 }

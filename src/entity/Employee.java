@@ -68,4 +68,11 @@ public abstract class Employee extends User {
 				+ "," + this.getBirthDate().toString() + "," + this.getPhoneNumber() + "," + this.getRole().name() + "," +
 				this.getDegree().name() + "," + this.getEmploymentDate().toString() + "," + Double.toString(this.getBaseSalary());
 	}
+	
+	@Override
+	public Object[] toCell() {
+		Object data[] = {this.getUsername(), this.getPassword(), this.getName(), this.getLastName(), this.getGender(), this.getBirthDate(), 
+		        this.getPhoneNumber(), this.getRole(), this.getDegree(), this.getEmploymentDate(), this.getBaseSalary()};
+		return data;
+	}
 }

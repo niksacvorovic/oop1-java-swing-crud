@@ -166,9 +166,11 @@ public class Hotel {
 		for(String i:pm.services) {
 			services += i + ",";
 		}
-		services = services.substring(0, services.length() - 1);
-		buffer.add(services);
-		buffer.add(ReservationManager.getRequestID() + "," + ReservationManager.getReservationID() + "," + PricingManager.getPricingID());
+		if(!services.isBlank()) {
+			services = services.substring(0, services.length() - 1);
+			buffer.add(services);
+			buffer.add(ReservationManager.getRequestID() + "," + ReservationManager.getReservationID() + "," + PricingManager.getPricingID());
+		}
 		try {
 			Files.write(Paths.get("." + sep + "data" + sep + "misc.csv"), buffer);
 		} catch (IOException e) {

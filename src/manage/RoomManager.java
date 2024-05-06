@@ -7,15 +7,16 @@ import java.util.ArrayList;
 
 import entity.Room;
 import enums.RoomStatus;
-import enums.RoomType;
 import exceptions.DuplicateIDException;
 import exceptions.NonexistentEntityException;
 
 public class RoomManager {
 	public ArrayList<Room> rooms;
+	public ArrayList<String> roomTypes;
 	
 	public RoomManager() {
 		this.rooms = new ArrayList<Room>();
+		this.roomTypes = new ArrayList<String>();
 	}
 	
 	public void saveData() {
@@ -31,15 +32,20 @@ public class RoomManager {
 		}
 	}
 	
-	public void createRoom(String roomNumber, RoomType type)  {
+	public void createRoom(String roomNumber, String type)  {
 		for(Room i:rooms) {
 			if(i.getRoomNumber().equals(roomNumber)) {
 				throw new DuplicateIDException();
 			}
 		}
-		Room r = new Room(roomNumber, type, RoomStatus.SLOBODNA, null);
-		rooms.add(r);
+		if(roomTypes.contains(type)) {
+			Room r = new Room(roomNumber, type, RoomStatus.SLOBODNA, null);
+			rooms.add(r);
+		}else {
+			throw new DuplicateIDException();
+		}
 	}
+		
 	
 	public Room readRoom(String roomNumber) {
 		Room r = null;
@@ -55,10 +61,15 @@ public class RoomManager {
 		return r;
 	}
 	
-	public void updateRoom(String roomNumber, RoomType type, RoomStatus status)  {
+	public void updateRoom(String roomNumber, String type, RoomStatus status)  {
 		Room r = readRoom(roomNumber);
 		r.type = type;
 		r.status = status;
+	}
+	
+	public void updateRoom(String roomNumber, String type)  {
+		Room r = readRoom(roomNumber);
+		r.type = type;
 	}
 	
 	public void deleteRoom(String roomNumber)  {

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import entity.Pricing;
-import enums.RoomType;
 import exceptions.NonexistentEntityException;
 
 public class PricingManager {
@@ -21,9 +20,6 @@ public class PricingManager {
 		this.pricings = new ArrayList<Pricing>();
 		this.services = new ArrayList<String>();
 		this.roomTypes = new ArrayList<String>();
-		for(RoomType i:RoomType.values()) {
-			roomTypes.add(i.toString());
-		}
 	}
 	
 	public static String getPricingID() {

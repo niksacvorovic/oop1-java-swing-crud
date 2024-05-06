@@ -3,16 +3,15 @@ package entity;
 import java.util.ArrayList;
 
 import enums.RoomStatus;
-import enums.RoomType;
 
 public class Room {
 	private String roomNumber;
-	public RoomType type;
+	public String type;
 	public RoomStatus status;
 	public Cleaner cleaner;
 	public ArrayList<Reservation> reservations;
 	
-	public Room(String roomNumber, RoomType type, RoomStatus status, Cleaner cleaner) {
+	public Room(String roomNumber, String type, RoomStatus status, Cleaner cleaner) {
 		this.roomNumber = roomNumber;
 		this.type = type;
 		this.status = status;
@@ -26,7 +25,7 @@ public class Room {
 	
 	@Override
 	public String toString() {
-		String str = "Broj sobe: " + this.roomNumber + "\nTip sobe: " + this.type.toString() + "\nStatus: " + this.status.toString();
+		String str = "Broj sobe: " + this.roomNumber + "\nTip sobe: " + this.type + "\nStatus: " + this.status.toString();
 		if (this.cleaner == null) {
 			str += "\nOdržavanje: nema\nRezervacije: ";
 		}else {
@@ -44,10 +43,20 @@ public class Room {
 	
 	public String toFileString() {
 		if (this.cleaner == null) {
-			return this.getRoomNumber() + "," + this.type.name() + "," + this.status.name();	
+			return this.getRoomNumber() + "," + this.type + "," + this.status.name();	
 		}else{
-			return this.getRoomNumber() + "," + this.type.name() + "," + this.status.name() + "," + this.cleaner.getUsername();
+			return this.getRoomNumber() + "," + this.type + "," + this.status.name() + "," + this.cleaner.getUsername();
 		}
-		
+	}
+	
+	public Object[] toCell() {
+		String cleanerString = null;
+		if (this.cleaner == null) {
+			cleanerString = "-";
+		}else {
+			cleanerString = this.cleaner.getUsername();
+		}
+		Object data[] = {this.getRoomNumber(), this.type, this.status, cleanerString};
+		return data;
 	}
 }

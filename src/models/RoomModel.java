@@ -1,26 +1,25 @@
 package models;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import entity.Employee;
+import entity.Room;
 
-public class EmployeeModel extends AbstractTableModel {
+public class RoomModel extends AbstractTableModel {
 	
 	private static final long serialVersionUID = 1L;
-	private String columnNames[] = {"Korisničko ime", "Lozinka", "Ime", "Prezime", "Pol", "Datum rođenja", "Broj telefona", "Radno mesto",
-			"Obrazovanje", "Datum zaposlenja", "Osnovna plata"};
-	private List<Employee> data;
+	private String columnNames[] = {"Broj sobe", "Tip sobe", "Status sobe", "Zaduženi higijeničar"};
+	private List<Room> data;
 	
-	public EmployeeModel(ArrayList<Employee> data) {
+	public RoomModel(ArrayList<Room> data) {
 		this.data = data;
 	}
-	public Employee getData(int index) {
+	public Room getData(int index) {
 		return data.get(index);
 	}
-	public void addData(Employee e) {
+	public void addData(Room e) {
 		this.data.add(e);
 	}
 	@Override
@@ -37,7 +36,8 @@ public class EmployeeModel extends AbstractTableModel {
 	}
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		Employee e = data.get(rowIndex);
+		Room e = data.get(rowIndex);
 		return e.toCell()[columnIndex];
 	}
+
 }

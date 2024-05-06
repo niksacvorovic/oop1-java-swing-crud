@@ -20,10 +20,12 @@ import exceptions.NonexistentEntityException;
 
 public class UserManager {
 	public ArrayList<User> users;
+	public ArrayList<Guest> guests;
 	public ArrayList<Employee> employees;
 	
 	public UserManager() {
 		this.users = new ArrayList<User>();
+		this.guests = new ArrayList<Guest>();
 		this.employees = new ArrayList<Employee>();
 	}
 	
@@ -78,6 +80,7 @@ public class UserManager {
 			}
 		}
 		Guest a = new Guest(username, password, name, lastName, gender, birthDate, phoneNumber);
+		guests.add(a);
 		users.add(a);
 	}
 	
@@ -138,6 +141,11 @@ public class UserManager {
 	public void deleteUser(String username) 
 	{
 		User e = readUser(username);
+		if (e instanceof Employee){
+			employees.remove(e);
+		}else if(e instanceof Guest) {
+			guests.remove(e);
+		}
 		users.remove(e);
 	}
 }

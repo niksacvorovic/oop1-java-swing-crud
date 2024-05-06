@@ -23,7 +23,6 @@ import enums.Gender;
 import enums.ReservationStatus;
 import enums.Role;
 import enums.RoomStatus;
-import enums.RoomType;
 import manage.PricingManager;
 import manage.ReservationManager;
 import manage.RoomManager;
@@ -62,6 +61,7 @@ public class Hotel {
 				User e = null;
 				if (data.length == 7) {
 					e = new Guest(data[0], data[1], data[2], data[3], Gender.valueOf(data[4]), LocalDate.parse(data[5]), data[6]);
+					um.guests.add((Guest) e);
 				}
 				else {
 					Role role = Role.valueOf(data[7]);
@@ -92,9 +92,9 @@ public class Hotel {
 				String data[] = i.split(",");
 				Room r = null;
 				if(data.length == 3) {
-					r = new Room(data[0], RoomType.valueOf(data[1]), RoomStatus.valueOf(data[2]), null);
+					r = new Room(data[0], data[1], RoomStatus.valueOf(data[2]), null);
 				}else{
-					r = new Room(data[0], RoomType.valueOf(data[1]), RoomStatus.valueOf(data[2]), (Cleaner) um.readUser(data[3]));
+					r = new Room(data[0], data[1], RoomStatus.valueOf(data[2]), (Cleaner) um.readUser(data[3]));
 					r.cleaner.rooms.add(r);
 				}
 				rom.rooms.add(r);
@@ -103,7 +103,7 @@ public class Hotel {
 			List<String> requestData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "requests.csv"));
 			for(String i:requestData) {
 				String data[] = i.split(",");
-				Request r = new Request(data[0], (Guest) um.readUser(data[1]), ReservationStatus.valueOf(data[2]), RoomType.valueOf(data[3]), 
+				Request r = new Request(data[0], (Guest) um.readUser(data[1]), ReservationStatus.valueOf(data[2]), data[3], 
 						LocalDate.parse(data[4]), LocalDate.parse(data[5]), new ArrayList<String>());
 				for(int j = 0; j + 6 < data.length; j++) {
 					r.services.add(data[j + 6]);
@@ -137,11 +137,15 @@ public class Hotel {
 			}
 			//učitavanje ostalog 
 			List<String> miscData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "misc.csv"));
-			if(miscData.size() == 2){
+			if(miscData.size() == 3){
 				for(String i:miscData.get(0).split(",")) {
 					pm.services.add(i);
 				}
-				String ids[] = miscData.get(1).split(",");
+				for(String i:miscData.get(1).split(",")) {
+					rom.roomTypes.add(i);
+					pm.roomTypes.add(i);
+				}
+				String ids[] = miscData.get(2).split(",");
 				ReservationManager.setRequestID(ids[0]);
 				ReservationManager.setReservationID(ids[1]);
 				PricingManager.setPricingID(ids[2]);
@@ -166,9 +170,15 @@ public class Hotel {
 		for(String i:pm.services) {
 			services += i + ",";
 		}
-		if(!services.isBlank()) {
+		String roomTypes = "";
+		for(String i:rom.roomTypes) {
+			roomTypes += i + ",";
+		}
+		if(!(services.isBlank()) && !(roomTypes.isBlank())) {
 			services = services.substring(0, services.length() - 1);
+			roomTypes = roomTypes.substring(0, roomTypes.length() - 1);
 			buffer.add(services);
+			buffer.add(roomTypes);
 			buffer.add(ReservationManager.getRequestID() + "," + ReservationManager.getReservationID() + "," + PricingManager.getPricingID());
 		}
 		try {
@@ -183,7 +193,7 @@ public class Hotel {
 		LocalDate begin = null;
 		LocalDate end = null;
 		for(Room i:rom.rooms) {
-			if (i.type == r.type) {
+			if (i.type.equals(r.type)) {
 				available.add(i);
 			}
 		}
@@ -256,8 +266,8 @@ public class Hotel {
 		newcleaner.rooms.add(r.room);
 	}
 	
-	public ArrayList<RoomType> showAvailable(LocalDate begin, LocalDate end) {
-		ArrayList<RoomType> available = new ArrayList<RoomType>();
+	public ArrayList<String> showAvailable(LocalDate begin, LocalDate end) {
+		ArrayList<String> available = new ArrayList<String>();
 		LocalDate loop = begin;
 		boolean check = true;
 		while(end.compareTo(loop) >= 0) {

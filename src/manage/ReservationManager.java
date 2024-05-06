@@ -11,7 +11,6 @@ import entity.Request;
 import entity.Reservation;
 import entity.Room;
 import enums.ReservationStatus;
-import enums.RoomType;
 import exceptions.NonexistentEntityException;
 
 public class ReservationManager {
@@ -60,7 +59,7 @@ public class ReservationManager {
 		}
 	}
 	
-	public void createRequest(Guest guest, RoomType type, LocalDate begin, LocalDate end, ArrayList<String> services) {
+	public void createRequest(Guest guest, String type, LocalDate begin, LocalDate end, ArrayList<String> services) {
 		String ID = requestID.toString();
 		requestID ++;
 		Request r = new Request(ID, guest, ReservationStatus.NA_CEKANJU, type, begin, end, services);

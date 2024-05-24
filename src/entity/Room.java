@@ -15,7 +15,7 @@ public class Room {
 		this.roomNumber = roomNumber;
 		this.type = type;
 		this.status = status;
-		this.cleaner = null;
+		this.cleaner = cleaner;
 		this.reservations = new ArrayList<Reservation>();
 	}
 

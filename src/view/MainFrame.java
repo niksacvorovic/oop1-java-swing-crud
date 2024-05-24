@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -110,7 +111,7 @@ public class MainFrame extends JFrame {
 				if(e.getKeyCode() == 10 && !usernameField.getText().equals("") && !passwordField.getText().equals("")) {
 					login(usernameField, passwordField, um, d);
 				}
-				if(e.getKeyCode() == 40) {
+				if(e.getKeyCode() == 38 || e.getKeyCode() == 40) {
 					passwordField.requestFocus();
 				}
 			}
@@ -121,7 +122,7 @@ public class MainFrame extends JFrame {
 				if(e.getKeyCode() == 10 && !usernameField.getText().equals("") && !passwordField.getText().equals("")) {
 					login(usernameField, passwordField, um, d);
 				}
-				if(e.getKeyCode() == 38) {
+				if(e.getKeyCode() == 38 || e.getKeyCode() == 40) {
 					usernameField.requestFocus();
 				}
 			}
@@ -143,10 +144,10 @@ public class MainFrame extends JFrame {
 			AdminFrame(hotel);
 			d.dispose();
 		}else if(loggedin instanceof Receptioner) {
-			ReceptionerFrame();
+			ReceptionerFrame(hotel);
 			d.dispose();
 		}else if(loggedin instanceof Cleaner) {
-			CleanerFrame();
+			CleanerFrame((Cleaner) loggedin);
 			d.dispose();
 		}else{
 			JOptionPane.showMessageDialog(null, "Neispravni podaci! Pokušajte opet");
@@ -160,15 +161,24 @@ public class MainFrame extends JFrame {
 		setVisible(true);
 	}
 	
-	public void ReceptionerFrame() {
-		
+	public void ReceptionerFrame(Hotel hotel) {
+		setTitle("Hotel SIIT - Recepcija");
+		contentPane = new ReceptionerPanel(hotel);
+		setContentPane(contentPane);
+		setVisible(true);
 	}
 	
-	public void CleanerFrame() {
-		
+	public void CleanerFrame(Cleaner c) {
+		setTitle("Hotel SIIT - Održavanje");
+		contentPane = new CleanerPanel(c);
+		setContentPane(contentPane);
+		setVisible(true);
 	}
 	
 	public void GuestFrame() {
-		
+		setTitle("Hotel SIIT - ");
+		contentPane = new AdminPanel(hotel);
+		setContentPane(contentPane);
+		setVisible(true);
 	}
 }

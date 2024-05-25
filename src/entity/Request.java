@@ -51,4 +51,14 @@ public class Request {
 		}
 		return save;
 	}
+	
+	public Object[] toCell() {
+		StringBuilder sb = new StringBuilder("");
+		for(String i:this.services) {
+			sb.append(i + ",");
+		}
+		String services = sb.substring(0, sb.length() - 1);
+		Object data[] = {this.getID(), this.guest.getUsername(), this.status, this.type, this.begin, this.end, services};
+		return data;
+	}
 }

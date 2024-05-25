@@ -200,29 +200,35 @@ public class EmployeeOptionsPanel extends JPanel {
 		saveButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String username = usernameField.getText();
-				String password = passwordField.getText();
-				String name = nameField.getText();
-				String surname = surnameField.getText();
-				Gender gender = (Gender) genderField.getSelectedItem();
-				LocalDate birthDate = LocalDate.parse(birthDateField.getText());
-				String phoneNumber = phoneNumField.getText();
-				Degree degree = (Degree) degreeField.getSelectedItem();
-				LocalDate employment = LocalDate.parse(employmentField.getText());
-				Double salary = Double.parseDouble(salaryField.getText());
-				hotel.um.updateEmployee(username, password, name, surname, gender, birthDate, phoneNumber, degree, employment, salary);
-				data.fireTableDataChanged();
-				saveButton.setEnabled(false);
-				usernameField.setEditable(true);
-				usernameField.setText("");
-				passwordField.setText("");
-				nameField.setText("");
-				surnameField.setText("");
-				phoneNumField.setText("");
-				salaryField.setText("");
-				birthDateField.setText("yyyy-mm-dd");
-				employmentField.setText("yyyy-mm-dd");
-				JOptionPane.showMessageDialog(null, "Izmene su uspešno sačuvane!");
+				try {
+					String username = usernameField.getText();
+					String password = passwordField.getText();
+					String name = nameField.getText();
+					String surname = surnameField.getText();
+					Gender gender = (Gender) genderField.getSelectedItem();
+					LocalDate birthDate = LocalDate.parse(birthDateField.getText());
+					String phoneNumber = phoneNumField.getText();
+					Degree degree = (Degree) degreeField.getSelectedItem();
+					LocalDate employment = LocalDate.parse(employmentField.getText());
+					Double salary = Double.parseDouble(salaryField.getText());
+					hotel.um.updateEmployee(username, password, name, surname, gender, birthDate, phoneNumber, degree, employment, salary);
+					data.fireTableDataChanged();
+					saveButton.setEnabled(false);
+					usernameField.setEditable(true);
+					usernameField.setText("");
+					passwordField.setText("");
+					nameField.setText("");
+					surnameField.setText("");
+					phoneNumField.setText("");
+					salaryField.setText("");
+					birthDateField.setText("yyyy-mm-dd");
+					employmentField.setText("yyyy-mm-dd");
+					JOptionPane.showMessageDialog(null, "Izmene su uspešno sačuvane!");
+				}catch(Exception ex) {
+					JOptionPane.showMessageDialog(null, "Uneti su neispravni podaci!");
+				}
+				
+				
 			}
 		});
 		deleteButton.addActionListener(new ActionListener() {
@@ -248,32 +254,5 @@ public class EmployeeOptionsPanel extends JPanel {
                 employmentField.setText("");
             }
         });
-		add(tableContainer);
-		add(usernameLabel);
-		add(passwordLabel);
-		add(nameLabel);
-		add(surnameLabel);
-		add(genderLabel);
-		add(birthDateLabel);
-		add(phoneNumLabel);
-		add(roleLabel);
-		add(degreeLabel);
-		add(employmentLabel);
-		add(salaryLabel);
-		add(usernameField);
-		add(passwordField);
-		add(nameField);
-		add(surnameField);
-		add(genderField);
-		add(birthDateField);
-		add(roleField);
-		add(degreeField);
-		add(employmentField);
-		add(salaryField);
-		add(addButton);
-		add(changeButton);
-		add(saveButton);
-		add(deleteButton);
-		setVisible(true);
 	}
 }

@@ -48,4 +48,9 @@ public class Reservation{
 		}
 		return save;
 	}
+	
+	public Object[] toCell() {
+		Object data[] = {this.getID(), this.guest, this.room, this.begin, this.end, this.price, this.services};
+		return data;
+	}
 }

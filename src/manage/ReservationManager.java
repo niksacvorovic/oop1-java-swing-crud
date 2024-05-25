@@ -60,6 +60,9 @@ public class ReservationManager {
 	}
 	
 	public void createRequest(Guest guest, String type, LocalDate begin, LocalDate end, ArrayList<String> services) {
+		if (end.compareTo(begin) < 0) {
+			throw new RuntimeException();
+		}
 		String ID = requestID.toString();
 		requestID ++;
 		Request r = new Request(ID, guest, ReservationStatus.NA_CEKANJU, type, begin, end, services);

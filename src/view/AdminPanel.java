@@ -24,6 +24,11 @@ public class AdminPanel extends JPanel {
 		adminPanes.addTab("Upravljanje gostima", guestPanel);
 		JPanel roomPanel = new RoomOptionsPanel(hotel);
 		adminPanes.addTab("Upravljanje sobama", roomPanel);
+		JPanel requestPanel = new RequestOptionsPanel(hotel);
+		adminPanes.addTab("Upravljanje zahtevima", requestPanel);
+		JPanel reservationPanel = new ReservationOptionsPanel(hotel);
+		adminPanes.addTab("Upravljanje rezervacijama", reservationPanel);
+		JPanel pricingPanel = new PricingOptionsPanel(hotel);
+		adminPanes.addTab("Upravljanje cenovnicima", pricingPanel);
 	}
-
 }

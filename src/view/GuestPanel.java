@@ -1,19 +1,18 @@
 package view;
 
-import java.util.ArrayList;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -23,32 +22,43 @@ import javax.swing.JTextField;
 
 import entity.Guest;
 import entity.Request;
-import entity.Room;
+import entity.Reservation;
 import enums.Status;
-
-import javax.swing.JCheckBox;
-
 import hotel.Hotel;
 import models.RequestModel;
+import models.ReservationModel;
 
-public class RequestOptionsPanel extends JPanel {
-	public RequestOptionsPanel(Hotel hotel) {
+public class GuestPanel extends JPanel {
+	public GuestPanel(Hotel hotel, Guest g) {
 		GroupLayout requestOptionsLayout = new GroupLayout(this);
 		requestOptionsLayout.setAutoCreateContainerGaps(true);
 		requestOptionsLayout.setAutoCreateGaps(true);
 		setLayout(requestOptionsLayout);
-		RequestModel data = new RequestModel(hotel.rem.requests);
-		JTable requestTable = new JTable(data);
-		JScrollPane tableContainer = new JScrollPane(requestTable);
-		JLabel guestLabel = new JLabel("Gost:");
+		ArrayList<Reservation> accepted = new ArrayList<Reservation>();
+		ArrayList<Request> pending = new ArrayList<Request>();
+		for(Object o:g.userInputs) {
+			if(o instanceof Reservation) {
+				Reservation r = (Reservation) o;
+				if(r.status == Status.POTVRDJENA) {
+					accepted.add(r);
+				}
+			}else {
+				Request req = (Request) o;
+				if(req.status == Status.NA_CEKANJU) {
+					pending.add(req);
+				}
+			}
+		}
+		RequestModel reqData = new RequestModel(pending); 
+		ReservationModel data = new ReservationModel(accepted);
+		JTable reservationTable = new JTable(data);
+		JTable requestTable = new JTable(reqData);
+		JScrollPane reqTableContainer = new JScrollPane(requestTable);
+		JScrollPane tableContainer = new JScrollPane(reservationTable);
 		JLabel typeLabel = new JLabel("Željeni tip sobe:");
 		JLabel beginLabel = new JLabel("Željeni početak:");
 		JLabel endLabel = new JLabel("Željeni kraj:");
-		JTextField guestField = new JTextField();
 		DefaultComboBoxModel roomTypes = new DefaultComboBoxModel();
-		for(String i:hotel.rom.roomTypes) {
-			roomTypes.addElement(i);
-		}
 		JComboBox typeField = new JComboBox(roomTypes);
 		JTextField startField = new JTextField();
 		JTextField endField = new JTextField();
@@ -59,63 +69,70 @@ public class RequestOptionsPanel extends JPanel {
 			boxes.add(box);
 			checkBoxContainer.add(box);
 		}
+		JButton availableButton = new JButton("Dostupni tipovi soba");
 		JButton addButton = new JButton("Dodajte zahtev");
-		JButton deleteButton = new JButton("Obrišite zahtev");
-		JButton validateButton = new JButton("Validirajte zahtev");
-		JButton rejectButton = new JButton("Odbijte zahtev");
+		JButton deleteButton = new JButton("Otkažite zahtev");
 		startField.setText("yyyy-mm-dd");
 		endField.setText("yyyy-mm-dd");
 		requestOptionsLayout.setHorizontalGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addComponent(reqTableContainer)
 				.addComponent(tableContainer)
 				.addGroup(requestOptionsLayout.createSequentialGroup()
 						.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-								.addComponent(guestLabel)
-								.addComponent(typeLabel)
 								.addComponent(beginLabel)
-								.addComponent(endLabel))
+								.addComponent(endLabel)
+								.addComponent(typeLabel))
 						.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-								.addComponent(guestField, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(typeField, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(startField, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(availableButton, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(endField, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addComponent(checkBoxContainer)
 						.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 								.addComponent(addButton, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(validateButton, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(rejectButton, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(deleteButton, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						)
 				);
 		requestOptionsLayout.setVerticalGroup(requestOptionsLayout.createSequentialGroup()
+				.addComponent(reqTableContainer)
 				.addComponent(tableContainer)
 				.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 						.addGroup(requestOptionsLayout.createSequentialGroup()
-								.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-										.addComponent(guestLabel)
-										.addComponent(guestField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-								.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-										.addComponent(typeLabel)
-										.addComponent(typeField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 								.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 										.addComponent(beginLabel)
 										.addComponent(startField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 								.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 										.addComponent(endLabel)
 										.addComponent(endField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(availableButton)
+								.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+										.addComponent(typeLabel)
+										.addComponent(typeField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 								)
 						.addComponent(checkBoxContainer)
 						.addGroup(requestOptionsLayout.createSequentialGroup()
 								.addComponent(addButton)
-								.addComponent(validateButton)
-								.addComponent(rejectButton)
 								.addComponent(deleteButton))
 						)					
 				);
+		availableButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					LocalDate start = LocalDate.parse(startField.getText());
+					LocalDate end = LocalDate.parse(endField.getText());
+					ArrayList<String> available = hotel.showAvailable(start, end);
+					roomTypes.removeAllElements();
+					roomTypes.addAll(available);
+				}catch(Exception ex) {
+					JOptionPane.showMessageDialog(null, "Neispravni podaci! Pokušajte opet");
+				}
+			}
+		});
 		addButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Guest guest = (Guest) hotel.um.readUser(guestField.getText());
 					String roomType = (String) typeField.getSelectedItem(); 
 					LocalDate begin = LocalDate.parse(startField.getText());
 					LocalDate end = LocalDate.parse(endField.getText());
@@ -125,79 +142,26 @@ public class RequestOptionsPanel extends JPanel {
 							services.add(i.getText());
 						}
 					}
-					hotel.rem.createRequest(guest, roomType, begin, end, services);
+					hotel.rem.createRequest(g, roomType, begin, end, services);
 					data.fireTableDataChanged();
-					JOptionPane.showMessageDialog(null, "Zahtev je uspešno dodat!");
+					JOptionPane.showMessageDialog(null, "Zahtev je uspešno poslat!");
 				}catch(Exception ex) {
 					JOptionPane.showMessageDialog(null, "Neispravni podaci! Pokušajte opet");
 				}
-				guestField.setText("");
 				typeField.setSelectedIndex(0);
 				for(JCheckBox i:boxes) {
 					i.setSelected(false);
 				}
 				startField.setText("yyyy-mm-dd");
 				endField.setText("yyyy-mm-dd");
-			}
-		});
-		validateButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (requestTable.getSelectedRow() != -1) {
-					Request fetch = data.getData(requestTable.getSelectedRow());
-					ArrayList<Room> available = hotel.validateRequest(fetch);
-					if(available.isEmpty()) {
-						JOptionPane.showMessageDialog(null, "Nema dostupnih soba. Zahtev je odbijen!");
-					}else {
-						JDialog chooseRoom = new JDialog();
-						FlowLayout dialogLayout = new FlowLayout(FlowLayout.RIGHT);
-						chooseRoom.setLayout(dialogLayout);
-						chooseRoom.setTitle("Odabir sobe");
-						chooseRoom.setResizable(false);
-						chooseRoom.setBounds(300, 300, 250, 75);
-						JLabel roomLabel = new JLabel("Odaberite sobu:");
-						DefaultComboBoxModel rooms = new DefaultComboBoxModel();
-						for(Room i:available) {
-							rooms.addElement(i.getRoomNumber());
-						}
-						JComboBox roomPicker = new JComboBox(rooms);
-						JButton apply = new JButton("Primenite");
-						apply.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								String roomNumber = (String) roomPicker.getSelectedItem();
-								hotel.transformRequest(fetch, hotel.rom.readRoom(roomNumber));
-								chooseRoom.dispose();
-							}
-						});
-						chooseRoom.getContentPane().add(roomLabel);
-						chooseRoom.getContentPane().add(roomPicker);
-						chooseRoom.getContentPane().add(apply);
-						chooseRoom.setVisible(true);
-					}
-					data.fireTableDataChanged();
-				}else {
-					JOptionPane.showMessageDialog(null, "Niste selektovali nijedan red u tabeli!");
-				}
-			}
-		});
-		rejectButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (requestTable.getSelectedRow() != -1) {
-					Request r = data.getData(requestTable.getSelectedRow());
-					r.status = Status.ODBIJENA;
-					data.fireTableDataChanged();
-				}else {
-					JOptionPane.showMessageDialog(null, "Niste selektovali nijedan red u tabeli!");
-				}
+				roomTypes.removeAllElements();
 			}
 		});
 		deleteButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					hotel.rem.deleteRequest((String) data.getValueAt(requestTable.getSelectedRow(), 0));
+					hotel.rem.deleteRequest((String) data.getValueAt(reservationTable.getSelectedRow(), 0));
 					data.fireTableDataChanged();
 				}catch(Exception ex) {
 					JOptionPane.showMessageDialog(null, "Niste selektovali nijedan red u tabeli!");

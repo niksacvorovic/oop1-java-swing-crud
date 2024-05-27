@@ -138,7 +138,7 @@ public class MainFrame extends JFrame {
 			}
 		}catch (Exception ex) {}
 		if(loggedin instanceof Guest) {
-			GuestFrame();
+			GuestFrame(hotel, (Guest) loggedin);
 			d.dispose();
 		}else if(loggedin instanceof Administrator) {
 			AdminFrame(hotel);
@@ -175,9 +175,9 @@ public class MainFrame extends JFrame {
 		setVisible(true);
 	}
 	
-	public void GuestFrame() {
-		setTitle("Hotel SIIT - ");
-		contentPane = new AdminPanel(hotel);
+	public void GuestFrame(Hotel hotel, Guest g) {
+		setTitle("Hotel SIIT - Gost");
+		contentPane = new GuestPanel(hotel, g);
 		setContentPane(contentPane);
 		setVisible(true);
 	}

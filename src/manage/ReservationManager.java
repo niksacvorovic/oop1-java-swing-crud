@@ -10,7 +10,7 @@ import entity.Guest;
 import entity.Request;
 import entity.Reservation;
 import entity.Room;
-import enums.ReservationStatus;
+import enums.Status;
 import exceptions.NonexistentEntityException;
 
 public class ReservationManager {
@@ -65,7 +65,7 @@ public class ReservationManager {
 		}
 		String ID = requestID.toString();
 		requestID ++;
-		Request r = new Request(ID, guest, ReservationStatus.NA_CEKANJU, type, begin, end, services);
+		Request r = new Request(ID, guest, Status.NA_CEKANJU, type, begin, end, services);
 		guest.userInputs.add(r);
 		requests.add(r);
 	}
@@ -92,7 +92,7 @@ public class ReservationManager {
 	public void createReservation(Request r, Room room, double price) {
 		String ID = reservationID.toString();
 		reservationID ++;
-		Reservation res = new Reservation(ID, r.guest, room, r.begin, r.end, price, r.services);
+		Reservation res = new Reservation(ID, r.guest, room, r.begin, r.end, Status.POTVRDJENA, price, r.services);
 		r.guest.userInputs.remove(r);
 		r.guest.userInputs.add(res);
 		reservations.add(res);
@@ -114,13 +114,14 @@ public class ReservationManager {
 
 	}
 	
-	public void updateReservation(String ID, Guest guest, Room room, LocalDate begin, LocalDate end, double price, 
+	public void updateReservation(String ID, Guest guest, Room room, LocalDate begin, LocalDate end, Status status, double price, 
 			ArrayList<String> services)  {
 		Reservation r = readReservation(ID);
 		r.guest = guest;
 		r.room = room;
 		r.begin = begin;
 		r.end = end;
+		r.status = status;
 		r.price = price;
 		r.services = services;
 	}

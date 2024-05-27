@@ -176,18 +176,7 @@ public class RoomOptionsPanel extends JPanel {
 				}	
 			}
 		});
-		add(tableContainer);
-		add(roomNumberLabel);
-		add(roomTypeLabel);
-		add(roomNumberField);
-		add(roomTypeField);
-		add(addButton);
-		add(changeButton);
-		add(saveButton);
-		add(deleteButton);
-		add(typesListLabel);
-		add(roomTypesList);
-		setVisible(true);
+		
 	}
 
 }

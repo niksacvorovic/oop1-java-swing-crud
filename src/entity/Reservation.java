@@ -3,23 +3,38 @@ package entity;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import enums.Status;
+
 public class Reservation{
 	private String ID;
 	public Guest guest;
 	public Room room;
 	public LocalDate begin;
 	public LocalDate end;
+	public Status status;
 	public double price;
 	public ArrayList<String> services;
 	
-	public Reservation(String ID, Guest guest, Room room, LocalDate begin, LocalDate end, double price, ArrayList<String> services) {
+	public Reservation(String ID, Guest guest, Room room, LocalDate begin, LocalDate end, Status status, double price, ArrayList<String> services) {
 		this.ID = ID;
 		this.guest = guest;
 		this.room = room;
 		this.begin = begin;
 		this.end = end;
+		this.status = status;
 		this.price = price;
 		this.services = services;
+	}
+	
+	public Reservation(Reservation r) {
+		this.ID = r.getID();
+		this.guest = r.guest;
+		this.room = r.room;
+		this.begin = r.begin;
+		this.end = r.end;
+		this.status = r.status;
+		this.price = r.price;
+		this.services = r.services;
 	}
 	
 	public String getID() {
@@ -41,8 +56,9 @@ public class Reservation{
 	}
 	
 	public String toFileString() {
+		String activity = null;
 		String save = this.getID() + "," + this.guest.getUsername() + "," + this.room.getRoomNumber() + "," + this.begin.toString() + "," + 
-				this.end.toString() + "," + Double.toString(this.price);
+				this.end.toString() + "," + this.status.name() + "," + Double.toString(this.price);
 		for(String s:this.services) {
 			save += "," + s;
 		}
@@ -50,7 +66,12 @@ public class Reservation{
 	}
 	
 	public Object[] toCell() {
-		Object data[] = {this.getID(), this.guest, this.room, this.begin, this.end, this.price, this.services};
+		StringBuilder sb = new StringBuilder("");
+		for(String i:this.services) {
+			sb.append(i + ",");
+		}
+		String services = sb.substring(0, sb.length() - 1);
+		Object data[] = {this.getID(), this.guest.getUsername(), this.room.getRoomNumber(), this.begin, this.end, this.status.toString(), this.price, services};
 		return data;
 	}
 }

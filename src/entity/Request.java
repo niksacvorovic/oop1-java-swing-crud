@@ -3,18 +3,18 @@ package entity;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import enums.ReservationStatus;
+import enums.Status;
 
 public class Request {
 	private String ID;
 	public Guest guest;
-	public ReservationStatus status;
+	public Status status;
 	public String type;
 	public LocalDate begin;
 	public LocalDate end;
 	public ArrayList<String> services;
 	
-	public Request(String ID, Guest guest, ReservationStatus status, String type, LocalDate begin, LocalDate end, 
+	public Request(String ID, Guest guest, Status status, String type, LocalDate begin, LocalDate end, 
 			ArrayList<String> services) {
 		this.ID = ID;
 		this.guest = guest;

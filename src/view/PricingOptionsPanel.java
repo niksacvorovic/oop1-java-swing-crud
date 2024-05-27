@@ -9,5 +9,6 @@ import hotel.Hotel;
 
 public class PricingOptionsPanel extends JPanel {
 	public PricingOptionsPanel(Hotel hotel) {
+		
 	}
 }

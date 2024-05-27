@@ -10,7 +10,7 @@ import entity.Reservation;
 public class ReservationModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
-	private String[] columnNames = {"ID", "Gost", "Soba", "Početak", "Kraj", "Cena", "Dodatne usluge"};
+	private String[] columnNames = {"ID", "Gost", "Soba", "Početak", "Kraj", "Status", "Cena", "Dodatne usluge"};
 	private List<Reservation> data;
 	
 	public ReservationModel(ArrayList<Reservation> data) {

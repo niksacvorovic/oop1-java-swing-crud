@@ -20,7 +20,7 @@ import entity.Room;
 import entity.User;
 import enums.Degree;
 import enums.Gender;
-import enums.ReservationStatus;
+import enums.Status;
 import enums.Role;
 import enums.RoomStatus;
 import manage.PricingManager;
@@ -103,7 +103,7 @@ public class Hotel {
 			List<String> requestData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "requests.csv"));
 			for(String i:requestData) {
 				String data[] = i.split(",");
-				Request r = new Request(data[0], (Guest) um.readUser(data[1]), ReservationStatus.valueOf(data[2]), data[3], 
+				Request r = new Request(data[0], (Guest) um.readUser(data[1]), Status.valueOf(data[2]), data[3], 
 						LocalDate.parse(data[4]), LocalDate.parse(data[5]), new ArrayList<String>());
 				for(int j = 0; j + 6 < data.length; j++) {
 					r.services.add(data[j + 6]);
@@ -116,9 +116,9 @@ public class Hotel {
 			for(String i:reservationData) {
 				String data[] = i.split(",");
 				Reservation r = new Reservation(data[0], (Guest) um.readUser(data[1]), rom.readRoom(data[2]), LocalDate.parse(data[3]),
-						LocalDate.parse(data[4]), Double.parseDouble(data[5]), new ArrayList<String>());
-				for(int j = 0; j + 6 < data.length; j++) {
-					r.services.add(data[j + 6]);
+						LocalDate.parse(data[4]), Status.valueOf(data[5]) ,Double.parseDouble(data[6]), new ArrayList<String>());
+				for(int j = 0; j + 7 < data.length; j++) {
+					r.services.add(data[j + 7]);
 				}
 				r.guest.userInputs.add(r);
 				r.room.reservations.add(r);
@@ -197,22 +197,40 @@ public class Hotel {
 				available.add(i);
 			}
 		}
-		for(Reservation i:rem.reservations) {
-			check = i.room;
-			if(available.contains(check)) {
-				begin = i.begin;
-				end = i.end;
+		for(Room i:available) {
+			for (Reservation e:i.reservations) {
+				begin = e.begin;
+				end = e.end;
 				if(begin.compareTo(r.end) < 0 || end.compareTo(r.begin) > 0) {
 					available.remove(check);
 				}
 			}
 		}
 		if (available.isEmpty()) {
-			r.status = ReservationStatus.ODBIJENA;
+			r.status = Status.ODBIJENA;
 		}else{
-			r.status = ReservationStatus.POTVDJENA;
+			r.status = Status.POTVRDJENA;
 		}
 		return available;
+	}
+	
+	public boolean validateReservationChanges(Reservation r, Room newroom, LocalDate newbegin, LocalDate newend) {
+		Reservation copy = new Reservation(r);
+		LocalDate begin = null;
+		LocalDate end = null;
+		copy.room = newroom;
+		copy.begin = newbegin;
+		copy.end = newend;
+		for(Reservation e:newroom.reservations) {
+			if(e != r) {
+				begin = e.begin;
+				end = e.end;
+				if(begin.compareTo(r.end) < 0 || end.compareTo(r.begin) > 0) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 	
 	public double applyPricing(Request r) {
@@ -233,11 +251,31 @@ public class Hotel {
 		}
 		return price;
 	}
+
+	public double applyPricing(Reservation r) {
+		double price = 0;
+		Pricing current = null;
+		LocalDate date = r.begin;
+		while(r.end.compareTo(date) >= 0) {
+			for(Pricing p:pm.pricings) {
+				if(date.compareTo(p.startDate) > 0 && date.compareTo(p.endDate) <= 0) {
+					current = p;
+					break;
+				}
+			}
+			price += current.servicePrices.get(r.room.type.toString());
+			for(String i:r.services) {
+				price += current.servicePrices.get(i);
+			}
+		}
+		r.price = price;
+		return price;
+	}
 	
-	public void checkIn(Request r, Room room)  {
+	public void transformRequest(Request r, Room room)  {
 		double price = applyPricing(r);
 		ArrayList<Room> available = validateRequest(r); 
-		if(r.status == ReservationStatus.POTVDJENA && available.contains(room) && room.status == RoomStatus.SLOBODNA) {
+		if(r.status == Status.POTVRDJENA && available.contains(room) && room.status == RoomStatus.SLOBODNA) {
 			room.status = RoomStatus.ZAUZETA;
 			rem.createReservation(r, room, price);
 			rem.requests.remove(r);
@@ -245,6 +283,7 @@ public class Hotel {
 	}
 	
 	public void checkOut(Reservation r) {
+		r.status = Status.ZAVRSENA;
 		r.room.status = RoomStatus.SPREMANJE;
 		Cleaner next = null;
 		Cleaner newcleaner = null;

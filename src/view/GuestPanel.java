@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -29,13 +30,8 @@ import models.RequestModel;
 import models.ReservationModel;
 
 public class GuestPanel extends JPanel {
-	public GuestPanel(Hotel hotel, Guest g) {
-		GroupLayout requestOptionsLayout = new GroupLayout(this);
-		requestOptionsLayout.setAutoCreateContainerGaps(true);
-		requestOptionsLayout.setAutoCreateGaps(true);
-		setLayout(requestOptionsLayout);
-		ArrayList<Reservation> accepted = new ArrayList<Reservation>();
-		ArrayList<Request> pending = new ArrayList<Request>();
+	
+	public void loadUserInputs(Guest g, ArrayList<Reservation> accepted, ArrayList<Request> pending) {
 		for(Object o:g.userInputs) {
 			if(o instanceof Reservation) {
 				Reservation r = (Reservation) o;
@@ -49,12 +45,23 @@ public class GuestPanel extends JPanel {
 				}
 			}
 		}
+	}
+	public GuestPanel(Hotel hotel, Guest g) {
+		GroupLayout requestOptionsLayout = new GroupLayout(this);
+		requestOptionsLayout.setAutoCreateContainerGaps(true);
+		requestOptionsLayout.setAutoCreateGaps(true);
+		setLayout(requestOptionsLayout);
+		ArrayList<Reservation> accepted = new ArrayList<Reservation>();
+		ArrayList<Request> pending = new ArrayList<Request>();
+		loadUserInputs(g, accepted, pending);
 		RequestModel reqData = new RequestModel(pending); 
-		ReservationModel data = new ReservationModel(accepted);
-		JTable reservationTable = new JTable(data);
+		ReservationModel resData = new ReservationModel(accepted);
+		JTable reservationTable = new JTable(resData);
 		JTable requestTable = new JTable(reqData);
 		JScrollPane reqTableContainer = new JScrollPane(requestTable);
-		JScrollPane tableContainer = new JScrollPane(reservationTable);
+		reqTableContainer.setBorder(BorderFactory.createTitledBorder("Zahtevi"));
+		JScrollPane resTableContainer = new JScrollPane(reservationTable);
+		resTableContainer.setBorder(BorderFactory.createTitledBorder("Rezervacije"));
 		JLabel typeLabel = new JLabel("Željeni tip sobe:");
 		JLabel beginLabel = new JLabel("Željeni početak:");
 		JLabel endLabel = new JLabel("Željeni kraj:");
@@ -72,11 +79,12 @@ public class GuestPanel extends JPanel {
 		JButton availableButton = new JButton("Dostupni tipovi soba");
 		JButton addButton = new JButton("Dodajte zahtev");
 		JButton deleteButton = new JButton("Otkažite zahtev");
+		JButton cancelButton = new JButton("Otkažite rezervaciju");
 		startField.setText("yyyy-mm-dd");
 		endField.setText("yyyy-mm-dd");
 		requestOptionsLayout.setHorizontalGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addComponent(reqTableContainer)
-				.addComponent(tableContainer)
+				.addComponent(resTableContainer)
 				.addGroup(requestOptionsLayout.createSequentialGroup()
 						.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 								.addComponent(beginLabel)
@@ -90,12 +98,13 @@ public class GuestPanel extends JPanel {
 						.addComponent(checkBoxContainer)
 						.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 								.addComponent(addButton, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(deleteButton, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(deleteButton, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(cancelButton, 200, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						)
 				);
 		requestOptionsLayout.setVerticalGroup(requestOptionsLayout.createSequentialGroup()
 				.addComponent(reqTableContainer)
-				.addComponent(tableContainer)
+				.addComponent(resTableContainer)
 				.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 						.addGroup(requestOptionsLayout.createSequentialGroup()
 								.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -112,7 +121,8 @@ public class GuestPanel extends JPanel {
 						.addComponent(checkBoxContainer)
 						.addGroup(requestOptionsLayout.createSequentialGroup()
 								.addComponent(addButton)
-								.addComponent(deleteButton))
+								.addComponent(deleteButton)
+								.addComponent(cancelButton))
 						)					
 				);
 		availableButton.addActionListener(new ActionListener() {
@@ -143,7 +153,8 @@ public class GuestPanel extends JPanel {
 						}
 					}
 					hotel.rem.createRequest(g, roomType, begin, end, services);
-					data.fireTableDataChanged();
+					loadUserInputs(g, accepted, pending);
+					reqData.fireTableDataChanged();
 					JOptionPane.showMessageDialog(null, "Zahtev je uspešno poslat!");
 				}catch(Exception ex) {
 					JOptionPane.showMessageDialog(null, "Neispravni podaci! Pokušajte opet");
@@ -160,10 +171,28 @@ public class GuestPanel extends JPanel {
 		deleteButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					hotel.rem.deleteRequest((String) data.getValueAt(reservationTable.getSelectedRow(), 0));
-					data.fireTableDataChanged();
-				}catch(Exception ex) {
+				if(requestTable.getSelectedRow() != -1) {
+					Request r = hotel.rem.readRequest((String) reqData.getValueAt(requestTable.getSelectedRow(), 0));
+					r.status = Status.OTKAZANA;
+					JOptionPane.showMessageDialog(null, "Zahtev je uspešno otkazan!");
+					reqData.fireTableDataChanged();
+				}else {
+					JOptionPane.showMessageDialog(null, "Niste selektovali nijedan red u tabeli!");
+				}
+			}
+		});
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(reservationTable.getSelectedRow() != -1) {
+					Reservation r = hotel.rem.readReservation((String) resData.getValueAt(reservationTable.getSelectedRow(), 0));
+					//String[] options = {"Otkažite", "Odustanite"};
+					//JOptionPane.showConfirmDialog(null, "Poništavanjem rezervacije nemate pravo na povraćaj novca. Da li ste sigurni?",
+					//		"Potvrda otkazivanja", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+					r.status = Status.OTKAZANA;
+					accepted.remove(r);
+					resData.fireTableDataChanged();
+				}else {
 					JOptionPane.showMessageDialog(null, "Niste selektovali nijedan red u tabeli!");
 				}
 			}

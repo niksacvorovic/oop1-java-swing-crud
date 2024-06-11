@@ -2,14 +2,15 @@ package entity;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class Pricing {
 	private String ID;
 	public LocalDate startDate;
 	public LocalDate endDate;
-	public HashMap<String, Double> servicePrices;
+	public LinkedHashMap<String, Double> servicePrices;
 	
-	public Pricing(String ID, LocalDate start, LocalDate end, HashMap<String, Double> servicePrices) {
+	public Pricing(String ID, LocalDate start, LocalDate end, LinkedHashMap<String, Double> servicePrices) {
 		this.ID = ID;
 		this.startDate = start;
 		this.endDate = end;
@@ -47,5 +48,10 @@ public class Pricing {
 			sb.append("," + key + "-" + Double.toString(value));
 		});
 		return sb.toString();
+	}
+	
+	public Object[] toCell() {
+		Object data[] = {this.getID(), this.startDate.toString(), this.endDate.toString(), "Kliknite dvaput za pregled"};
+		return data;
 	}
 }

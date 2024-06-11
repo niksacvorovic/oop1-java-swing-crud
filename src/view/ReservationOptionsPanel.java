@@ -1,5 +1,7 @@
 package view;
 
+import java.awt.Dialog.ModalityType;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,11 +10,13 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -40,9 +44,14 @@ public class ReservationOptionsPanel extends JPanel {
 				validRequests.add(i);
 			}
 		}
+		RequestModel reqData = new RequestModel(validRequests);
+		JTable requestTable = new JTable(reqData);
+		JScrollPane reqTableContainer = new JScrollPane(requestTable);
 		ReservationModel resData = new ReservationModel(hotel.rem.reservations);
+		reqTableContainer.setBorder(BorderFactory.createTitledBorder("Potvrđeni zahtevi"));
 		JTable reservationTable = new JTable(resData);
-		JScrollPane tableContainer = new JScrollPane(reservationTable);
+		JScrollPane resTableContainer = new JScrollPane(reservationTable);
+		resTableContainer.setBorder(BorderFactory.createTitledBorder("Rezervacije"));
 		JLabel IDLabel = new JLabel("ID:");
 		JLabel guestLabel = new JLabel("Gost:");
 		JLabel roomLabel = new JLabel("Soba:");
@@ -66,10 +75,14 @@ public class ReservationOptionsPanel extends JPanel {
 		JButton changeButton = new JButton("Izmenite rezervaciju");
 		JButton saveButton = new JButton("Sačuvajte izmene");
 		JButton checkOutButton = new JButton("Check Out");
+		JButton refreshButton = new JButton("Osvežite tabelu");
+		saveButton.setEnabled(false);
 		startField.setText("yyyy-mm-dd");
 		endField.setText("yyyy-mm-dd");
 		reservationOptionsLayout.setHorizontalGroup(reservationOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addComponent(tableContainer)
+				.addComponent(reqTableContainer)
+				.addComponent(resTableContainer)
+				.addComponent(refreshButton)
 				.addGroup(reservationOptionsLayout.createSequentialGroup()
 						.addGroup(reservationOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 								.addComponent(IDLabel)
@@ -93,7 +106,9 @@ public class ReservationOptionsPanel extends JPanel {
 						)
 				);
 		reservationOptionsLayout.setVerticalGroup(reservationOptionsLayout.createSequentialGroup()
-				.addComponent(tableContainer)
+				.addComponent(reqTableContainer)
+				.addComponent(resTableContainer)
+				.addComponent(refreshButton)
 				.addGroup(reservationOptionsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 						.addGroup(reservationOptionsLayout.createSequentialGroup()
 								.addGroup(reservationOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -127,16 +142,37 @@ public class ReservationOptionsPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (reservationTable.getSelectedRow() != -1) {
-						Reservation r = resData.getData(reservationTable.getSelectedRow());
-						if(r.status == Status.POTVRDJENA) {
-							r.status = Status.U_TOKU;
-							resData.fireTableDataChanged();
-							JOptionPane.showMessageDialog(null, "Uspešna rezervacija!");
-						}else {
-							JOptionPane.showMessageDialog(null, "Rezervacija nema status \"Potvrđeno!\"");
+					if (requestTable.getSelectedRow() != -1) {
+						Request r = reqData.getData(requestTable.getSelectedRow());
+						JDialog chooseRoom = new JDialog();
+						FlowLayout dialogLayout = new FlowLayout(FlowLayout.RIGHT);
+						chooseRoom.setLayout(dialogLayout);
+						chooseRoom.setTitle("Odabir sobe");
+						chooseRoom.setResizable(false);
+						chooseRoom.setBounds(300, 300, 250, 75);
+						JLabel roomLabel = new JLabel("Odaberite sobu:");
+						DefaultComboBoxModel rooms = new DefaultComboBoxModel();
+						ArrayList<Room> available = hotel.availableRooms(r.type, r.begin, r.end);
+						for(Room i:available) {
+							rooms.addElement(i.getRoomNumber());
 						}
-						
+						JComboBox roomPicker = new JComboBox(rooms);
+						JButton apply = new JButton("Primenite");
+						apply.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								String roomNumber = (String) roomPicker.getSelectedItem();
+								hotel.checkIn(r, hotel.rom.readRoom(roomNumber));
+								resData.fireTableDataChanged();
+								reqData.fireTableDataChanged();
+								chooseRoom.dispose();
+							}
+						});
+						chooseRoom.getContentPane().add(roomLabel);
+						chooseRoom.getContentPane().add(roomPicker);
+						chooseRoom.getContentPane().add(apply);
+						chooseRoom.setModalityType(ModalityType.APPLICATION_MODAL);
+						chooseRoom.setVisible(true);
 					}else {
 						JOptionPane.showMessageDialog(null, "Niste selektovali nijedan red u tabeli!");
 					}
@@ -220,6 +256,19 @@ public class ReservationOptionsPanel extends JPanel {
 				}else {
 					JOptionPane.showMessageDialog(null, "Niste selektovali nijedan red u tabeli!");
 				}
+			}
+		});
+		refreshButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				validRequests.clear();
+				for(Request i:hotel.rem.requests) {
+					if(i.status == Status.POTVRDJENA) {
+						validRequests.add(i);
+					}
+				}
+				reqData.fireTableDataChanged();
+				resData.fireTableDataChanged();
 			}
 		});
 		startField.addMouseListener(new MouseAdapter(){

@@ -86,6 +86,7 @@ public class ReservationManager {
 	
 	public void deleteRequest(String ID)  {
 		Request r = readRequest(ID);
+		r.guest.userInputs.remove(r);
 		requests.remove(r);
 	}
 	
@@ -102,7 +103,7 @@ public class ReservationManager {
 	public Reservation readReservation(String ID) {
 		Reservation r = null;
 		for(Reservation i:reservations) {
-			if(i.getID() == ID) {
+			if(i.getID().equals(ID)) {
 				r = i;
 				break;
 			}
@@ -128,6 +129,7 @@ public class ReservationManager {
 	
 	public void deleteReservation(String ID) {
 		Reservation r = readReservation(ID);
+		r.guest.userInputs.remove(r);
 		reservations.remove(r);
 	}
 

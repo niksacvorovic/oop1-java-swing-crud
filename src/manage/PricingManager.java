@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import entity.Pricing;
 import exceptions.NonexistentEntityException;
@@ -44,10 +45,10 @@ public class PricingManager {
 	}
 	
 	public void createPricing(LocalDate start, LocalDate end, double... params) {
-		if (params.length != roomTypes.size() + services.size()) {
+		if (params.length != roomTypes.size() + services.size() || end.compareTo(start) < 0) {
 			throw new RuntimeException();
 		}
-		HashMap<String, Double> servicePrices = new HashMap<String, Double>();
+		LinkedHashMap<String, Double> servicePrices = new LinkedHashMap<String, Double>();
 		String ID = pricingID.toString();
 		pricingID++;
 		Pricing p = new Pricing(ID, start, end, servicePrices);
@@ -60,6 +61,30 @@ public class PricingManager {
 		for(Pricing i:pricings) {
 			if(p.startDate.compareTo(i.startDate) > 0 && p.endDate.compareTo(i.endDate) < 0) {
 				Pricing split = new Pricing(i);
+				split.startDate = p.endDate;
+				i.endDate = p.startDate;
+				pricings.add(split);
+			}else if(i.endDate.compareTo(p.startDate) > 0 && i.endDate.compareTo(p.endDate) < 0) {
+				i.endDate = p.startDate;
+			}else if(i.startDate.compareTo(p.startDate) > 0 && i.startDate.compareTo(p.endDate) < 0) {
+				i.startDate = p.endDate;
+			}
+		}
+		pricings.add(p);
+	}
+	
+	public void createPricing(LocalDate start, LocalDate end, LinkedHashMap<String, Double> prices) {
+		if (prices.size() != roomTypes.size() + services.size() || end.compareTo(start) < 0) {
+			throw new RuntimeException();
+		}
+		String ID = pricingID.toString();
+		pricingID++;
+		Pricing p = new Pricing(ID, start, end, prices);
+		for(Pricing i:pricings) {
+			if(p.startDate.compareTo(i.startDate) > 0 && p.endDate.compareTo(i.endDate) < 0) {
+				Pricing split = new Pricing(i);
+				pricingID++;
+				split.setID(pricingID.toString());
 				split.startDate = p.endDate;
 				i.endDate = p.startDate;
 				pricings.add(split);
@@ -91,7 +116,10 @@ public class PricingManager {
 		p.servicePrices.replace(service, price);
 	}
 		
-	public void updatePricing(String ID, LocalDate start, LocalDate end, HashMap<String, Double> servicePrices) {
+	public void updatePricing(String ID, LocalDate start, LocalDate end, LinkedHashMap<String, Double> servicePrices) {
+		if(end.compareTo(start) < 0) {
+			throw new RuntimeException();
+		}
 		Pricing p = readPricing(ID);
 		p.startDate = start;
 		p.endDate = end;

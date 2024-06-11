@@ -2,7 +2,8 @@ package view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -17,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import entity.Reservation;
 import entity.Room;
 import hotel.Hotel;
 import models.RoomModel;
@@ -176,7 +178,23 @@ public class RoomOptionsPanel extends JPanel {
 				}	
 			}
 		});
-		
+		roomTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(roomTable.getSelectedRow() != -1 && e.getClickCount() == 2) {
+					Room check = data.getData(roomTable.getSelectedRow());
+					if(check.reservations.size() == 0) {
+						JOptionPane.showMessageDialog(null, "Soba " + check.getRoomNumber() + " nema zakazane rezervacije");
+					}else {
+						String text = "Soba " + check.getRoomNumber() + " je rezervisana tokom sledećih perioda: ";
+						for(Reservation i:check.reservations) {
+							text += "\n" + i.begin.toString() + " - " + i.end.toString();
+						}
+						JOptionPane.showMessageDialog(null, text);
+					}
+				}
+			}
+		});
 	}
 
 }

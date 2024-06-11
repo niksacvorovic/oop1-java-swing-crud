@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import entity.Administrator;
@@ -128,7 +128,7 @@ public class Hotel {
 			List<String> pricingData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "pricings.csv"));
 			for(String i:pricingData) {
 				String data[] = i.split(",");
-				Pricing p = new Pricing(data[0], LocalDate.parse(data[1]), LocalDate.parse(data[2]), new HashMap<String, Double>());
+				Pricing p = new Pricing(data[0], LocalDate.parse(data[1]), LocalDate.parse(data[2]), new LinkedHashMap<String, Double>());
 				for(int j = 0; j + 3 < data.length; j++) {
 					String item[] = data[j + 3].split("-");
 					p.servicePrices.put(item[0], Double.parseDouble(item[1]));
@@ -187,9 +187,9 @@ public class Hotel {
 			e.printStackTrace();
 		}
 	}
+	
 	public ArrayList<Room> validateRequest(Request r) {
 		ArrayList<Room> available = new ArrayList<Room>();
-		Room check = null;
 		LocalDate begin = null;
 		LocalDate end = null;
 		for(Room i:rom.rooms) {
@@ -197,16 +197,26 @@ public class Hotel {
 				available.add(i);
 			}
 		}
+		int counter = 0;
+		if(r.status == Status.POTVRDJENA) {
+			counter = -1;
+		}
 		for(Room i:available) {
 			for (Reservation e:i.reservations) {
 				begin = e.begin;
 				end = e.end;
-				if(begin.compareTo(r.end) < 0 || end.compareTo(r.begin) > 0) {
-					available.remove(check);
+				if(begin.compareTo(r.end) <= 0 && end.compareTo(r.begin) >= 0) {
+					counter++;
 				}
 			}
 		}
-		if (available.isEmpty()) {
+		for(Request i:rem.requests) {
+			if(i.status == Status.POTVRDJENA && i.type.equals(r.type) && i.end.compareTo(r.begin) >= 0 && i.begin.compareTo(r.end) <= 0) {
+				counter++;
+			}
+		}
+		
+		if (available.isEmpty() || counter == available.size()) {
 			r.status = Status.ODBIJENA;
 		}else{
 			r.status = Status.POTVRDJENA;
@@ -225,7 +235,7 @@ public class Hotel {
 			if(e != r) {
 				begin = e.begin;
 				end = e.end;
-				if(begin.compareTo(r.end) < 0 || end.compareTo(r.begin) > 0) {
+				if(begin.compareTo(r.end) <= 0 && end.compareTo(r.begin) >= 0) {
 					return false;
 				}
 			}
@@ -248,6 +258,7 @@ public class Hotel {
 			for(String i:r.services) {
 				price += current.servicePrices.get(i);
 			}
+			date = date.plusDays(1);
 		}
 		return price;
 	}
@@ -267,15 +278,16 @@ public class Hotel {
 			for(String i:r.services) {
 				price += current.servicePrices.get(i);
 			}
+			date = date.plusDays(1);
 		}
 		r.price = price;
 		return price;
 	}
 	
-	public void transformRequest(Request r, Room room)  {
+	public void checkIn(Request r, Room room)  {
 		double price = applyPricing(r);
-		ArrayList<Room> available = validateRequest(r); 
-		if(r.status == Status.POTVRDJENA && available.contains(room) && room.status == RoomStatus.SLOBODNA) {
+		ArrayList<Room> available = availableRooms(r.type, r.begin, r.end); 
+		if(available.contains(room)) {
 			room.status = RoomStatus.ZAUZETA;
 			rem.createReservation(r, room, price);
 			rem.requests.remove(r);
@@ -316,7 +328,7 @@ public class Hotel {
 				}
 				check = true;
 				for(Reservation i:r.reservations) {
-					if(i.end.compareTo(loop) > 0 && i.begin.compareTo(loop) < 0) {
+					if(i.status != Status.POTVRDJENA && i.end.compareTo(loop) > 0 && i.begin.compareTo(loop) < 0) {
 						check = false;
 						break;
 					}
@@ -328,6 +340,25 @@ public class Hotel {
 			loop = loop.plusDays(1);
 		}
 		return available;
+	}
+	
+	public ArrayList<Room> availableRooms(String type, LocalDate begin, LocalDate end){
+		ArrayList<Room> rooms = new ArrayList<Room>();
+		boolean add = true;
+		for(Room i:rom.rooms) {
+			if(i.type.equals(type)) {
+				add = true;
+				for(Reservation res:i.reservations) {
+					if(res.status != Status.POTVRDJENA && begin.compareTo(res.end) <= 0 && end.compareTo(res.begin) >= 0) {
+						add = false;
+					}
+				}
+				if(add) {
+					rooms.add(i);
+				}
+			}
+		}
+		return rooms;
 	}
 	
 	public ArrayList<Object> showGuestInputs(String username){

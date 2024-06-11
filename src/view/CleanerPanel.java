@@ -4,6 +4,10 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -35,6 +39,15 @@ public class CleanerPanel extends JPanel {
 						r.status = RoomStatus.SLOBODNA;
 						r.cleaner = null;
 						c.rooms.remove(r);
+						String cleanlog = LocalDate.now().toString() + "," + r.getRoomNumber() + "," + c.getUsername();
+						ArrayList<String> write = new ArrayList<String>();
+						write.add(cleanlog);
+						String sep = System.getProperty("file.separator");
+						try {
+							Files.write(Paths.get("." + sep + "data" + sep + "incomelogs.csv"), write);
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
 						JOptionPane.showMessageDialog(null, "Soba je očišćena!");
 						data.fireTableDataChanged();
 					}catch(Exception ex) {

@@ -63,10 +63,12 @@ public class RequestOptionsPanel extends JPanel {
 		JButton deleteButton = new JButton("Obrišite zahtev");
 		JButton validateButton = new JButton("Validirajte zahtev");
 		JButton rejectButton = new JButton("Odbijte zahtev");
+		JButton refreshButton = new JButton("Osvežite tabelu");
 		startField.setText("yyyy-mm-dd");
 		endField.setText("yyyy-mm-dd");
 		requestOptionsLayout.setHorizontalGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addComponent(tableContainer)
+				.addComponent(refreshButton)
 				.addGroup(requestOptionsLayout.createSequentialGroup()
 						.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 								.addComponent(guestLabel)
@@ -88,6 +90,7 @@ public class RequestOptionsPanel extends JPanel {
 				);
 		requestOptionsLayout.setVerticalGroup(requestOptionsLayout.createSequentialGroup()
 				.addComponent(tableContainer)
+				.addComponent(refreshButton)
 				.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 						.addGroup(requestOptionsLayout.createSequentialGroup()
 								.addGroup(requestOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -145,35 +148,9 @@ public class RequestOptionsPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				if (requestTable.getSelectedRow() != -1) {
 					Request fetch = data.getData(requestTable.getSelectedRow());
-					ArrayList<Room> available = hotel.validateRequest(fetch);
-					if(available.isEmpty()) {
+					hotel.validateRequest(fetch);
+					if(fetch.status == Status.ODBIJENA) {
 						JOptionPane.showMessageDialog(null, "Nema dostupnih soba. Zahtev je odbijen!");
-					}else {
-						JDialog chooseRoom = new JDialog();
-						FlowLayout dialogLayout = new FlowLayout(FlowLayout.RIGHT);
-						chooseRoom.setLayout(dialogLayout);
-						chooseRoom.setTitle("Odabir sobe");
-						chooseRoom.setResizable(false);
-						chooseRoom.setBounds(300, 300, 250, 75);
-						JLabel roomLabel = new JLabel("Odaberite sobu:");
-						DefaultComboBoxModel rooms = new DefaultComboBoxModel();
-						for(Room i:available) {
-							rooms.addElement(i.getRoomNumber());
-						}
-						JComboBox roomPicker = new JComboBox(rooms);
-						JButton apply = new JButton("Primenite");
-						apply.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								String roomNumber = (String) roomPicker.getSelectedItem();
-								hotel.transformRequest(fetch, hotel.rom.readRoom(roomNumber));
-								chooseRoom.dispose();
-							}
-						});
-						chooseRoom.getContentPane().add(roomLabel);
-						chooseRoom.getContentPane().add(roomPicker);
-						chooseRoom.getContentPane().add(apply);
-						chooseRoom.setVisible(true);
 					}
 					data.fireTableDataChanged();
 				}else {
@@ -202,6 +179,12 @@ public class RequestOptionsPanel extends JPanel {
 				}catch(Exception ex) {
 					JOptionPane.showMessageDialog(null, "Niste selektovali nijedan red u tabeli!");
 				}
+			}
+		});
+		refreshButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				data.fireTableDataChanged();
 			}
 		});
 		startField.addMouseListener(new MouseAdapter(){

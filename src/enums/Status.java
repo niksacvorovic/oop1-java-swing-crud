@@ -5,13 +5,11 @@ public enum Status {
 	POTVRDJENA(1),
 	ODBIJENA(2),
 	OTKAZANA(3),
-	U_TOKU(4),
-	ZAVRSENA(5);
-	
+	ZAVRSENA(4);
 	int status;
 	private Status() {}
 	private Status(int i) {this.status = i;}
-	private String[] str = {"Na čekanju", "Potvrđena", "Odbijena", "Otkazana", "U toku", "Završena"};
+	private String[] str = {"Na čekanju", "Potvrđena", "Odbijena", "Otkazana", "Završena"};
 	
 	@Override
 	public String toString() {

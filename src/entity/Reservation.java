@@ -56,7 +56,6 @@ public class Reservation{
 	}
 	
 	public String toFileString() {
-		String activity = null;
 		String save = this.getID() + "," + this.guest.getUsername() + "," + this.room.getRoomNumber() + "," + this.begin.toString() + "," + 
 				this.end.toString() + "," + this.status.name() + "," + Double.toString(this.price);
 		for(String s:this.services) {

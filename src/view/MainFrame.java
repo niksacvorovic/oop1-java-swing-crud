@@ -9,6 +9,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -26,6 +27,7 @@ import entity.User;
 import entity.Guest;
 import entity.Administrator;
 import entity.Receptioner;
+import entity.RoomFeatureLink;
 import entity.Cleaner;
 import hotel.Hotel;
 import manage.UserManager;
@@ -147,7 +149,7 @@ public class MainFrame extends JFrame {
 			ReceptionerFrame(hotel);
 			d.dispose();
 		}else if(loggedin instanceof Cleaner) {
-			CleanerFrame((Cleaner) loggedin);
+			CleanerFrame((Cleaner) loggedin, hotel.rfm.roomFeatureLinks);
 			d.dispose();
 		}else{
 			JOptionPane.showMessageDialog(null, "Neispravni podaci! Pokušajte opet");
@@ -168,9 +170,9 @@ public class MainFrame extends JFrame {
 		setVisible(true);
 	}
 	
-	public void CleanerFrame(Cleaner c) {
+	public void CleanerFrame(Cleaner c, ArrayList<RoomFeatureLink> featureLinks) {
 		setTitle("Hotel SIIT - Održavanje");
-		contentPane = new CleanerPanel(c);
+		contentPane = new CleanerPanel(c, featureLinks);
 		setContentPane(contentPane);
 		setVisible(true);
 	}

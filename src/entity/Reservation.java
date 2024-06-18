@@ -70,7 +70,7 @@ public class Reservation{
 			sb.append(i + ",");
 		}
 		String services = sb.substring(0, sb.length() - 1);
-		Object data[] = {this.getID(), this.guest.getUsername(), this.room.getRoomNumber(), this.begin, this.end, this.status.toString(), this.price, services};
+		Object data[] = {this.getID(), this.guest.getUsername(), this.status.toString(), this.room.getRoomNumber(), this.begin, this.end, this.price, services};
 		return data;
 	}
 }

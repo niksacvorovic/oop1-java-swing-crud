@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -31,8 +32,8 @@ import models.PricingModel;
 public class PricingOptionsPanel extends JPanel {
 	public PricingOptionsPanel(Hotel hotel) {
 		GroupLayout pricingLayout = new GroupLayout(this);
-		pricingLayout.getAutoCreateContainerGaps();
-		pricingLayout.getAutoCreateGaps();
+		pricingLayout.setAutoCreateContainerGaps(true);
+		pricingLayout.setAutoCreateGaps(true);
 		PricingModel data = new PricingModel(hotel.pm.pricings);
 		JTable pricingTable = new JTable(data);
 		JScrollPane tableContainer = new JScrollPane(pricingTable);
@@ -104,6 +105,18 @@ public class PricingOptionsPanel extends JPanel {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
+							LinkedHashMap<String, Double> prices = new LinkedHashMap<String, Double>();
+							LocalDate startDate = LocalDate.parse(startField.getText());
+							LocalDate endDate = LocalDate.parse(endField.getText());
+							priceFields.forEach((key, value) ->{
+								Double price = Double.parseDouble(value.getText());
+								prices.put(key, price);
+							});
+							hotel.pm.createPricing(startDate, endDate, prices);
+							data.fireTableDataChanged();
+							addPricingDialog.dispose();
+							JOptionPane.showMessageDialog(null, "Cenovnik je uspešno dodat!");
+						}catch(ConcurrentModificationException ex) {
 							LinkedHashMap<String, Double> prices = new LinkedHashMap<String, Double>();
 							LocalDate startDate = LocalDate.parse(startField.getText());
 							LocalDate endDate = LocalDate.parse(endField.getText());
@@ -229,9 +242,12 @@ public class PricingOptionsPanel extends JPanel {
 					Pricing select = data.getData(pricingTable.getSelectedRow());
 					StringBuilder sb = new StringBuilder();
 					sb.append(String.format("Cenovnik za period od %s do %s\n", select.startDate.toString(),  select.endDate.toString()));
-					select.servicePrices.forEach((key, value) ->{
-						sb.append(String.format("%s: %s\n", key, value.toString()));
-					});
+					for(String i:hotel.pm.roomTypes) {
+						sb.append(String.format("%s: %s\n", i, select.servicePrices.get(i).toString()));
+					}
+					for(String i:hotel.pm.services) {
+						sb.append(String.format("%s: %s\n", i, select.servicePrices.get(i).toString()));
+					}
 					JOptionPane.showMessageDialog(null, sb.toString());
 				}
 			}

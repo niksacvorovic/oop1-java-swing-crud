@@ -1,2 +1,9 @@
-/module-info.class
+/entity/
+/enums/
+/exceptions/
+/hotel/
+/main/
 /manage/
+/models/
+/module-info.class
+/view/

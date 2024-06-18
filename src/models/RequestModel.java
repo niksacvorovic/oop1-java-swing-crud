@@ -10,7 +10,7 @@ import entity.Request;
 public class RequestModel extends AbstractTableModel {
 	
 	private static final long serialVersionUID = 1L;
-	private String[] columnNames = {"ID", "Gost", "Status", "Tip sobe", "Početak", "Kraj", "Dodatne usluge"};
+	private String[] columnNames = {"ID", "Gost", "Status", "Tip sobe", "Početak", "Kraj", "Cena", "Dodatne usluge"};
 	private List<Request> data;
 	
 	public RequestModel(ArrayList<Request> data) {

@@ -59,15 +59,16 @@ public class ReservationManager {
 		}
 	}
 	
-	public void createRequest(Guest guest, String type, LocalDate begin, LocalDate end, ArrayList<String> services) {
+	public Request createRequest(Guest guest, String type, LocalDate begin, LocalDate end, ArrayList<String> services) {
 		if (end.compareTo(begin) < 0) {
 			throw new RuntimeException();
 		}
 		String ID = requestID.toString();
 		requestID ++;
-		Request r = new Request(ID, guest, Status.NA_CEKANJU, type, begin, end, services);
+		Request r = new Request(ID, guest, Status.NA_CEKANJU, type, begin, end, 0, services);
 		guest.userInputs.add(r);
 		requests.add(r);
+		return r;
 	}
 	
 	public Request readRequest(String ID) {
@@ -90,14 +91,15 @@ public class ReservationManager {
 		requests.remove(r);
 	}
 	
-	public void createReservation(Request r, Room room, double price) {
+	public Reservation createReservation(Request r, Room room) {
 		String ID = reservationID.toString();
 		reservationID ++;
-		Reservation res = new Reservation(ID, r.guest, room, r.begin, r.end, Status.POTVRDJENA, price, r.services);
+		Reservation res = new Reservation(ID, r.guest, room, r.begin, r.end, Status.POTVRDJENA, r.price, r.services);
 		r.guest.userInputs.remove(r);
 		r.guest.userInputs.add(res);
 		reservations.add(res);
 		room.reservations.add(res);
+		return res;
 	}
 	
 	public Reservation readReservation(String ID) {

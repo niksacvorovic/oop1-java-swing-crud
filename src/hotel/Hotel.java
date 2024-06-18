@@ -17,6 +17,8 @@ import entity.Receptioner;
 import entity.Request;
 import entity.Reservation;
 import entity.Room;
+import entity.RoomFeature;
+import entity.RoomFeatureLink;
 import entity.User;
 import enums.Degree;
 import enums.Gender;
@@ -25,6 +27,7 @@ import enums.Role;
 import enums.RoomStatus;
 import manage.PricingManager;
 import manage.ReservationManager;
+import manage.RoomFeatureManager;
 import manage.RoomManager;
 import manage.UserManager;
 
@@ -33,6 +36,7 @@ public class Hotel {
 	public ReservationManager rem;
 	public RoomManager rom;
 	public UserManager um;
+	public RoomFeatureManager rfm;
 	
 	private static Hotel instance = null;
 	
@@ -41,6 +45,7 @@ public class Hotel {
 		this.rem = new ReservationManager();
 		this.rom = new RoomManager();
 		this.um = new UserManager();
+		this.rfm = new RoomFeatureManager();
 		loadData();
 	}
 	
@@ -99,14 +104,28 @@ public class Hotel {
 				}
 				rom.rooms.add(r);
 			}
+			//učitavanje osobina sobe
+			List<String> roomFeatureData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "roomfeatures.csv"));
+			for(String i:roomFeatureData) {
+				String data[] = i.split(",");
+				RoomFeature r = new RoomFeature(data[0], Double.parseDouble(data[1]));
+				rfm.roomFeatures.add(r);
+			}
+			//učitavanje veza soba - osobina
+			List<String> roomFeatureLinkData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "roomfeaturelinks.csv"));
+			for(String i:roomFeatureLinkData) {
+				String data[] = i.split(",");
+				RoomFeatureLink r = new RoomFeatureLink(rom.readRoom(data[0]), rfm.readRoomFeature(data[1]));
+				rfm.roomFeatureLinks.add(r);
+			}
 			//učitavanje zahteva
 			List<String> requestData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "requests.csv"));
 			for(String i:requestData) {
 				String data[] = i.split(",");
 				Request r = new Request(data[0], (Guest) um.readUser(data[1]), Status.valueOf(data[2]), data[3], 
-						LocalDate.parse(data[4]), LocalDate.parse(data[5]), new ArrayList<String>());
-				for(int j = 0; j + 6 < data.length; j++) {
-					r.services.add(data[j + 6]);
+						LocalDate.parse(data[4]), LocalDate.parse(data[5]), Double.parseDouble(data[6]), new ArrayList<String>());
+				for(int j = 0; j + 7 < data.length; j++) {
+					r.services.add(data[j + 7]);
 				}
 				r.guest.userInputs.add(r);
 				rem.requests.add(r);
@@ -160,6 +179,7 @@ public class Hotel {
 		rom.saveData();
 		rem.saveData();
 		pm.saveData();
+		rfm.saveData();
 		saveMisc();
 	}
 	
@@ -192,9 +212,28 @@ public class Hotel {
 		ArrayList<Room> available = new ArrayList<Room>();
 		LocalDate begin = null;
 		LocalDate end = null;
+		boolean hasAllFeatures = false;
+		ArrayList<RoomFeature> roomFeatures = new ArrayList<RoomFeature>();
+		ArrayList<RoomFeature> chosenFeatures = new ArrayList<RoomFeature>();
+		RoomFeature feat = null;
 		for(Room i:rom.rooms) {
 			if (i.type.equals(r.type)) {
-				available.add(i);
+				roomFeatures.clear();
+				chosenFeatures.clear();
+				for(RoomFeatureLink j:rfm.roomFeatureLinks) {
+					if(j.room.equals(i)) {
+						roomFeatures.add(j.feature);
+					}
+				}
+				for(String j:r.services) {
+					if(!pm.services.contains(j)) {
+						feat = rfm.readRoomFeature(j);
+						chosenFeatures.add(feat);
+					}
+				}
+				if(roomFeatures.containsAll(chosenFeatures)) {
+					available.add(i);
+				}
 			}
 		}
 		int counter = 0;
@@ -224,13 +263,26 @@ public class Hotel {
 		return available;
 	}
 	
-	public boolean validateReservationChanges(Reservation r, Room newroom, LocalDate newbegin, LocalDate newend) {
+	public boolean validateReservationChanges(Reservation r, Room newroom, LocalDate newbegin, LocalDate newend, ArrayList<String> features) {
 		Reservation copy = new Reservation(r);
 		LocalDate begin = null;
 		LocalDate end = null;
+		ArrayList<RoomFeature> newroomFeatures = new ArrayList<RoomFeature>();
+		ArrayList<RoomFeature> chosenFeatures = new ArrayList<RoomFeature>();
 		copy.room = newroom;
 		copy.begin = newbegin;
 		copy.end = newend;
+		for(RoomFeatureLink i:rfm.roomFeatureLinks) {
+			if(i.room.equals(newroom)) {
+				newroomFeatures.add(i.feature);
+			}
+		}
+		for(String i:features) {
+			chosenFeatures.add(rfm.readRoomFeature(i));
+		}
+		if(!newroomFeatures.containsAll(chosenFeatures)) {
+			return false;
+		}
 		for(Reservation e:newroom.reservations) {
 			if(e != r) {
 				begin = e.begin;
@@ -256,10 +308,15 @@ public class Hotel {
 			}
 			price += current.servicePrices.get(r.type.toString());
 			for(String i:r.services) {
-				price += current.servicePrices.get(i);
+				if(pm.services.contains(i)) {
+					price += current.servicePrices.get(i);
+				}else {
+					price += rfm.readRoomFeature(i).price;
+				}
 			}
 			date = date.plusDays(1);
 		}
+		r.price = price;
 		return price;
 	}
 
@@ -276,7 +333,11 @@ public class Hotel {
 			}
 			price += current.servicePrices.get(r.room.type.toString());
 			for(String i:r.services) {
-				price += current.servicePrices.get(i);
+				if(pm.services.contains(i)) {
+					price += current.servicePrices.get(i);
+				}else {
+					price += rfm.readRoomFeature(i).price;
+				}
 			}
 			date = date.plusDays(1);
 		}
@@ -285,11 +346,10 @@ public class Hotel {
 	}
 	
 	public void checkIn(Request r, Room room)  {
-		double price = applyPricing(r);
-		ArrayList<Room> available = availableRooms(r.type, r.begin, r.end); 
+		ArrayList<Room> available = availableRooms(r.type, r.begin, r.end, r.services); 
 		if(available.contains(room)) {
 			room.status = RoomStatus.ZAUZETA;
-			rem.createReservation(r, room, price);
+			rem.createReservation(r, room);
 			rem.requests.remove(r);
 		}
 	}
@@ -317,14 +377,21 @@ public class Hotel {
 		newcleaner.rooms.add(r.room);
 	}
 	
-	public ArrayList<String> showAvailable(LocalDate begin, LocalDate end) {
+	public ArrayList<String> showAvailable(LocalDate begin, LocalDate end, ArrayList<RoomFeature> features) {
 		ArrayList<String> available = new ArrayList<String>();
+		ArrayList<RoomFeature> roomFeatures = new ArrayList<RoomFeature>();
 		LocalDate loop = begin;
 		boolean check = true;
 		while(end.compareTo(loop) >= 0) {
 			for(Room r:rom.rooms) {
 				if(available.contains(r.type)) {
 					continue;
+				}
+				roomFeatures.clear();
+				for(RoomFeatureLink i:rfm.roomFeatureLinks) {
+					if(i.room.equals(r)) {
+						roomFeatures.add(i.feature);
+					}
 				}
 				check = true;
 				for(Reservation i:r.reservations) {
@@ -333,7 +400,8 @@ public class Hotel {
 						break;
 					}
 				}
-				if(check == true) {
+				
+				if(check == true && roomFeatures.containsAll(features)) {
 					available.add(r.type);
 				}
 			}
@@ -342,12 +410,28 @@ public class Hotel {
 		return available;
 	}
 	
-	public ArrayList<Room> availableRooms(String type, LocalDate begin, LocalDate end){
+	public ArrayList<Room> availableRooms(String type, LocalDate begin, LocalDate end, ArrayList<String> services){
 		ArrayList<Room> rooms = new ArrayList<Room>();
+		ArrayList<RoomFeature> chosenFeatures = new ArrayList<RoomFeature>();
+		ArrayList<RoomFeature> roomFeatures = new ArrayList<RoomFeature>();
+		for(String i:services) {
+			if(!pm.services.contains(i)) {
+				chosenFeatures.add(rfm.readRoomFeature(i));
+			}
+		}
 		boolean add = true;
 		for(Room i:rom.rooms) {
 			if(i.type.equals(type)) {
 				add = true;
+				roomFeatures.clear();
+				for(RoomFeatureLink link:rfm.roomFeatureLinks) {
+					if(link.room.equals(i)) {
+						roomFeatures.add(link.feature);
+					}
+				}
+				if(!roomFeatures.containsAll(chosenFeatures)) {
+					add = false;
+				}
 				for(Reservation res:i.reservations) {
 					if(res.status != Status.POTVRDJENA && begin.compareTo(res.end) <= 0 && end.compareTo(res.begin) >= 0) {
 						add = false;

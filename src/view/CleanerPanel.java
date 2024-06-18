@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -18,14 +19,16 @@ import javax.swing.JTable;
 
 import entity.Cleaner;
 import entity.Room;
+import entity.RoomFeatureLink;
 import enums.RoomStatus;
+import hotel.Hotel;
 import models.RoomModel;
 
 public class CleanerPanel extends JPanel {
-	public CleanerPanel(Cleaner c) {
+	public CleanerPanel(Cleaner c, ArrayList<RoomFeatureLink> featureLinks) {
 		FlowLayout cleanerLayout = new FlowLayout(FlowLayout.LEFT);
 		setLayout(cleanerLayout);
-		RoomModel data = new RoomModel(c.rooms);
+		RoomModel data = new RoomModel(c.rooms, featureLinks);
 		JTable roomTable = new JTable(data);
 		JButton cleanButton = new JButton("Očistite sobu");
 		JScrollPane tableContainer = new JScrollPane(roomTable);
@@ -39,12 +42,12 @@ public class CleanerPanel extends JPanel {
 						r.status = RoomStatus.SLOBODNA;
 						r.cleaner = null;
 						c.rooms.remove(r);
-						String cleanlog = LocalDate.now().toString() + "," + r.getRoomNumber() + "," + c.getUsername();
+						String cleanlog = LocalDate.now().toString() + "," + c.getUsername();
 						ArrayList<String> write = new ArrayList<String>();
 						write.add(cleanlog);
 						String sep = System.getProperty("file.separator");
 						try {
-							Files.write(Paths.get("." + sep + "data" + sep + "incomelogs.csv"), write);
+							Files.write(Paths.get("." + sep + "data" + sep + "cleanerlogs.csv"), write, StandardOpenOption.APPEND);
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}

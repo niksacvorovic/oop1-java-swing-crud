@@ -5,44 +5,38 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import entity.Reservation;
+import entity.RoomFeature;
 
-public class ReservationModel extends AbstractTableModel {
+public class RoomFeatureModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
-	private String[] columnNames = {"ID", "Gost", "Status", "Soba", "Početak", "Kraj", "Cena", "Dodatne usluge"};
-	private List<Reservation> data;
+	private String columnNames[] = {"Usluga", "Cena"};
+	private List<RoomFeature> data;
 	
-	public ReservationModel(ArrayList<Reservation> data) {
+	public RoomFeatureModel(ArrayList<RoomFeature> data) {
 		this.data = data;
 	}
-
-	public Reservation getData(int index) {
+	public RoomFeature getData(int index) {
 		return data.get(index);
 	}
-	
-	public void addData(Reservation r) {
-		this.data.add(r);
+	public void addData(RoomFeature e) {
+		this.data.add(e);
 	}
 	@Override
 	public int getRowCount() {
 		return data.size();
 	}
-
 	@Override
 	public int getColumnCount() {
 		return columnNames.length;
 	}
-
 	@Override
 	public String getColumnName(int col) {
 		return columnNames[col];
 	}
-	
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		Reservation r = data.get(rowIndex);
-		return r.toCell()[columnIndex];
+		RoomFeature e = data.get(rowIndex);
+		return e.toCell()[columnIndex];
 	}
-
 }

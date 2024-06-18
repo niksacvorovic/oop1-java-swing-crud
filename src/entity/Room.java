@@ -49,14 +49,14 @@ public class Room {
 		}
 	}
 	
-	public Object[] toCell() {
+	/*public Object[] toCell() {
 		String cleanerString = null;
 		if (this.cleaner == null) {
 			cleanerString = "-";
 		}else {
 			cleanerString = this.cleaner.getUsername();
 		}
-		Object data[] = {this.getRoomNumber(), this.type, this.status, cleanerString};
+		Object data[] = {this.getRoomNumber(), this.type, this.status, "Kliknite dvaput za pregled", cleanerString};
 		return data;
-	}
+	}*/
 }

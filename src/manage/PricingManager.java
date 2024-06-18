@@ -49,8 +49,8 @@ public class PricingManager {
 			throw new RuntimeException();
 		}
 		LinkedHashMap<String, Double> servicePrices = new LinkedHashMap<String, Double>();
-		String ID = pricingID.toString();
 		pricingID++;
+		String ID = pricingID.toString();
 		Pricing p = new Pricing(ID, start, end, servicePrices);
 		for(int i = 0; i < roomTypes.size(); i++) {
 			servicePrices.put(roomTypes.get(i), params[i]);
@@ -61,14 +61,16 @@ public class PricingManager {
 		for(Pricing i:pricings) {
 			if(p.startDate.compareTo(i.startDate) > 0 && p.endDate.compareTo(i.endDate) < 0) {
 				Pricing split = new Pricing(i);
-				split.startDate = p.endDate;
+				pricingID++;
+				split.setID(pricingID.toString());
 				i.endDate = p.startDate;
+				split.startDate = p.endDate;
 				pricings.add(split);
-			}else if(i.endDate.compareTo(p.startDate) > 0 && i.endDate.compareTo(p.endDate) < 0) {
+			}/*else if(i.endDate.compareTo(p.startDate) > 0 && i.endDate.compareTo(p.endDate) < 0) {
 				i.endDate = p.startDate;
 			}else if(i.startDate.compareTo(p.startDate) > 0 && i.startDate.compareTo(p.endDate) < 0) {
 				i.startDate = p.endDate;
-			}
+			}*/
 		}
 		pricings.add(p);
 	}
@@ -83,16 +85,16 @@ public class PricingManager {
 		for(Pricing i:pricings) {
 			if(p.startDate.compareTo(i.startDate) > 0 && p.endDate.compareTo(i.endDate) < 0) {
 				Pricing split = new Pricing(i);
-				pricingID++;
 				split.setID(pricingID.toString());
-				split.startDate = p.endDate;
+				pricingID++;
 				i.endDate = p.startDate;
+				split.startDate = p.endDate;
 				pricings.add(split);
-			}else if(i.endDate.compareTo(p.startDate) > 0 && i.endDate.compareTo(p.endDate) < 0) {
+			}/*else if(i.endDate.compareTo(p.startDate) > 0 && i.endDate.compareTo(p.endDate) < 0) {
 				i.endDate = p.startDate;
 			}else if(i.startDate.compareTo(p.startDate) > 0 && i.startDate.compareTo(p.endDate) < 0) {
 				i.startDate = p.endDate;
-			}
+			}*/
 		}
 		pricings.add(p);
 	}

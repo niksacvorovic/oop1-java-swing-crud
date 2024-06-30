@@ -224,42 +224,19 @@ public class RequestOptionsPanel extends JPanel {
 				for(String i:hotel.rom.roomTypes) {
 					roomTypesComboBoxModel.addElement(i);
 				}
-				DefaultComboBoxModel<String> roomComboBoxModel = new DefaultComboBoxModel<String>();
-				for(Room i:hotel.rom.rooms) {
-					roomComboBoxModel.addElement(i.getRoomNumber());
-				}
 				JComboBox filterRoomTypeField = new JComboBox(roomTypesComboBoxModel);
-				JComboBox filterRoomField = new JComboBox(roomComboBoxModel);
 				JTextField lowestPriceField = new JTextField();
 				JTextField highestPriceField = new JTextField();
 				JButton applyButton = new JButton("Primenite");
 				lowestPriceField.setMaximumSize(new Dimension(150, 20));
 				highestPriceField.setMaximumSize(new Dimension(150, 20));
 				filterRoomTypeField.setMaximumSize(new Dimension(150, 20));
-				filterRoomField.setMaximumSize(new Dimension(150, 20));
 				filterRoomTypeField.setSelectedIndex(-1);
-				filterRoomField.setSelectedIndex(-1);
-				filterRoomTypeField.addItemListener(new ItemListener() {
-					@Override
-					public void itemStateChanged(ItemEvent e) {
-						String selected = (String) filterRoomTypeField.getSelectedItem();
-						roomComboBoxModel.removeAllElements();
-						for(Room i:hotel.rom.rooms) {
-							if(i.type.equals(selected)) {
-								roomComboBoxModel.addElement(i.getRoomNumber());
-							}
-						}
-						filterRoomField.setSelectedIndex(-1);
-					}
-				});
-				JLabel filterRoomLabel = new JLabel("Odaberite sobu: ");
 				JLabel filterServicesLabel = new JLabel("Odaberite dodatne usluge: ");
 				JLabel lowestPriceLabel = new JLabel("Unesite najnižu cenu: ");
 				JLabel highestPriceLabel = new JLabel("Unesite najvišu cenu: ");
 				filterRoomTypeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 				filterRoomTypeField.setAlignmentX(Component.LEFT_ALIGNMENT);
-				filterRoomLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-				filterRoomField.setAlignmentX(Component.LEFT_ALIGNMENT);
 				filterServicesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 				lowestPriceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 				lowestPriceField.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -267,8 +244,6 @@ public class RequestOptionsPanel extends JPanel {
 				highestPriceField.setAlignmentX(Component.LEFT_ALIGNMENT);
 				filterDialog.getContentPane().add(filterRoomTypeLabel);
 				filterDialog.getContentPane().add(filterRoomTypeField);
-				filterDialog.getContentPane().add(filterRoomLabel);
-				filterDialog.getContentPane().add(filterRoomField);
 				filterDialog.getContentPane().add(lowestPriceLabel);
 				filterDialog.getContentPane().add(lowestPriceField);
 				filterDialog.getContentPane().add(highestPriceLabel);

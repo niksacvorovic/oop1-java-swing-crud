@@ -23,6 +23,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -95,12 +96,15 @@ public class ReservationOptionsPanel extends JPanel {
 		JButton changeButton = new JButton("Izmenite rezervaciju");
 		JButton saveButton = new JButton("Sačuvajte izmene");
 		JButton filterButton = new JButton("Filtrirajte tabele");
+		JButton dailyButton = new JButton("Dnevni dolasci i odlasci");
 		JButton checkOutButton = new JButton("Check Out");
 		saveButton.setEnabled(false);
 		startField.setText("yyyy-mm-dd");
 		endField.setText("yyyy-mm-dd");
 		reservationOptionsLayout.setHorizontalGroup(reservationOptionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addComponent(filterButton)
+				.addGroup(reservationOptionsLayout.createSequentialGroup()
+						.addComponent(filterButton)
+						.addComponent(dailyButton))
 				.addComponent(reqTableContainer)
 				.addComponent(resTableContainer)
 				.addGroup(reservationOptionsLayout.createSequentialGroup()
@@ -126,7 +130,9 @@ public class ReservationOptionsPanel extends JPanel {
 						)
 				);
 		reservationOptionsLayout.setVerticalGroup(reservationOptionsLayout.createSequentialGroup()
-				.addComponent(filterButton)
+				.addGroup(reservationOptionsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+						.addComponent(filterButton)
+						.addComponent(dailyButton))
 				.addComponent(reqTableContainer)
 				.addComponent(resTableContainer)
 				.addGroup(reservationOptionsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -460,6 +466,38 @@ public class ReservationOptionsPanel extends JPanel {
 				filterDialog.setTitle("Filtracija podataka");
 				filterDialog.getContentPane().add(applyButton);
 				filterDialog.setVisible(true);
+			}
+		});
+		dailyButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFrame dailyFrame = new JFrame();
+				BoxLayout dailyLayout = new BoxLayout(dailyFrame.getContentPane(), BoxLayout.PAGE_AXIS);
+				dailyFrame.getContentPane().setLayout(dailyLayout);
+				LocalDate today = LocalDate.now();
+				ArrayList<Reservation> checkedin = new ArrayList<Reservation>();
+				ArrayList<Reservation> checkedout = new ArrayList<Reservation>();
+				for(Reservation i:hotel.rem.reservations) {
+					if(i.begin.equals(today) && i.status == Status.POTVRDJENA) {
+						checkedin.add(i);
+					}
+					if(i.end.equals(today) && i.status == Status.ZAVRSENA) {
+						checkedout.add(i);
+					}
+				}
+				ReservationModel checkins = new ReservationModel(checkedin);
+				ReservationModel checkouts = new ReservationModel(checkedout);
+				JTable checkinsTable = new JTable(checkins);
+				JTable checkoutsTable = new JTable(checkouts);
+				JScrollPane checkinsContainer = new JScrollPane(checkinsTable);
+				JScrollPane checkoutsContainer = new JScrollPane(checkoutsTable);
+				checkinsContainer.setBorder(BorderFactory.createTitledBorder("Današnji dolasci"));
+				checkoutsContainer.setBorder(BorderFactory.createTitledBorder("Današnji odlasci"));
+				dailyFrame.getContentPane().add(checkinsContainer);
+				dailyFrame.getContentPane().add(checkoutsContainer);
+				dailyFrame.setTitle("Današnji dolasci / odlasci");
+				dailyFrame.setBounds(120, 120, 1000, 400);
+				dailyFrame.setVisible(true);
 			}
 		});
 		checkOutButton.addActionListener(new ActionListener() {

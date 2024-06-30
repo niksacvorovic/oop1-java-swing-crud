@@ -1,3 +1,4 @@
+/view/
 /entity/
 /enums/
 /exceptions/
@@ -5,5 +6,5 @@
 /main/
 /manage/
 /models/
-/module-info.class
-/view/
+/hotelTest/
+/manageTest/

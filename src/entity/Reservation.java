@@ -9,16 +9,18 @@ public class Reservation{
 	private String ID;
 	public Guest guest;
 	public Room room;
+	public LocalDate creationDate;
 	public LocalDate begin;
 	public LocalDate end;
 	public Status status;
 	public double price;
 	public ArrayList<String> services;
 	
-	public Reservation(String ID, Guest guest, Room room, LocalDate begin, LocalDate end, Status status, double price, ArrayList<String> services) {
+	public Reservation(String ID, Guest guest, Room room, LocalDate creationDate, LocalDate begin, LocalDate end, Status status, double price, ArrayList<String> services) {
 		this.ID = ID;
 		this.guest = guest;
 		this.room = room;
+		this.creationDate = creationDate;
 		this.begin = begin;
 		this.end = end;
 		this.status = status;
@@ -30,6 +32,7 @@ public class Reservation{
 		this.ID = r.getID();
 		this.guest = r.guest;
 		this.room = r.room;
+		this.creationDate = r.creationDate;
 		this.begin = r.begin;
 		this.end = r.end;
 		this.status = r.status;
@@ -56,8 +59,8 @@ public class Reservation{
 	}
 	
 	public String toFileString() {
-		String save = this.getID() + "," + this.guest.getUsername() + "," + this.room.getRoomNumber() + "," + this.begin.toString() + "," + 
-				this.end.toString() + "," + this.status.name() + "," + Double.toString(this.price);
+		String save = this.getID() + "," + this.guest.getUsername() + "," + this.room.getRoomNumber() + "," + this.creationDate.toString() + ","
+	+ this.begin.toString() + "," + this.end.toString() + "," + this.status.name() + "," + Double.toString(this.price);
 		for(String s:this.services) {
 			save += "," + s;
 		}

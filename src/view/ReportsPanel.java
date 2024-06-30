@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -30,9 +31,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+
+import org.knowm.xchart.PieChart;
+import org.knowm.xchart.PieChartBuilder;
+import org.knowm.xchart.XChartPanel;
+import org.knowm.xchart.XYChart;
+import org.knowm.xchart.XYChartBuilder;
 
 import entity.Cleaner;
 import entity.Employee;
@@ -45,6 +53,7 @@ import hotel.Hotel;
 
 public class ReportsPanel extends JPanel {
 	public ReportsPanel(Hotel hotel) {
+		String sep = System.getProperty("file.separator");
 		BoxLayout reportLayout = new BoxLayout(this, BoxLayout.Y_AXIS);
 		setLayout(reportLayout);
 		setBorder(BorderFactory.createTitledBorder("Izveštaji"));
@@ -66,6 +75,7 @@ public class ReportsPanel extends JPanel {
 		JRadioButton firstReport = new JRadioButton("Izveštaj 1 (Prihodi, rashodi, sobarice, potvrđene rezervacije)");
 		JRadioButton secondReport = new JRadioButton("Izveštaj 2 (Potvrđeni, otkazani i odbijeni zahtevi)");
 		JRadioButton thirdReport = new JRadioButton("Izveštaj 3 (Podaci o sobama)");
+		JRadioButton fourthReport = new JRadioButton("Izveštaj 4 (Grafikoni)");
 		JButton generate = new JButton("Generiši izveštaj");
 		startField.addMouseListener(new MouseAdapter(){
             @Override
@@ -83,9 +93,9 @@ public class ReportsPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					LocalDate startDate = LocalDate.parse(startField.getText());
-					LocalDate endDate = LocalDate.parse(endField.getText());
 					if(firstReport.isSelected()) {
+						LocalDate startDate = LocalDate.parse(startField.getText());
+						LocalDate endDate = LocalDate.parse(endField.getText());
 						JFrame report = new JFrame();
 						BoxLayout reportFrameLayout = new BoxLayout(report.getContentPane(), BoxLayout.Y_AXIS);
 						report.getContentPane().setLayout(reportFrameLayout);
@@ -121,7 +131,6 @@ public class ReportsPanel extends JPanel {
 								requestCount++;
 							}
 						}
-						String sep = System.getProperty("file.separator");
 						List<String> userData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "cleanerlogs.csv"));
 						HashMap<String, Integer> cleanCounter = new HashMap<String, Integer>();
 						for(Employee i:hotel.um.employees) {
@@ -163,6 +172,8 @@ public class ReportsPanel extends JPanel {
 						report.getContentPane().add(cleanerContainer);
 						report.setVisible(true);
 					}else if(secondReport.isSelected()) {
+						LocalDate startDate = LocalDate.parse(startField.getText());
+						LocalDate endDate = LocalDate.parse(endField.getText());
 						JFrame report = new JFrame();
 						BoxLayout reportFrameLayout = new BoxLayout(report.getContentPane(), BoxLayout.Y_AXIS);
 						report.getContentPane().setLayout(reportFrameLayout);
@@ -214,6 +225,8 @@ public class ReportsPanel extends JPanel {
 						report.getContentPane().add(cancelledLabel);
 						report.setVisible(true);
 					}else if(thirdReport.isSelected()) {
+						LocalDate startDate = LocalDate.parse(startField.getText());
+						LocalDate endDate = LocalDate.parse(endField.getText());
 						Room room = hotel.rom.readRoom((String) roomField.getSelectedItem());
 						JFrame report = new JFrame();
 						BoxLayout roomReportLayout = new BoxLayout(report.getContentPane(), BoxLayout.Y_AXIS);
@@ -248,6 +261,106 @@ public class ReportsPanel extends JPanel {
 						report.getContentPane().add(roomContainer);
 						report.getContentPane().add(roomDesc);
 						report.setVisible(true);
+					}else if(fourthReport.isSelected()) {
+						JFrame report = new JFrame();
+						JTabbedPane reportPanes = new JTabbedPane();
+						BorderLayout reportLayout = new BorderLayout();
+						report.setLayout(reportLayout);
+						LocalDate today = LocalDate.now();
+						//generisanje prvog grafikona
+						XYChart earningsChart = new XYChartBuilder().title("Zarada u prethodnih 12 meseci").build();
+						JPanel earningsPane = new XChartPanel(earningsChart);
+						LocalDate trackingDate = today.withDayOfMonth(1).minusYears(1).plusMonths(1);
+						double earnings[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+						double typeEarned[] = null;
+						double current[] = null;
+						HashMap<String, double[]> earningsPerType = new HashMap<String, double[]>();
+						for(String i:hotel.rom.roomTypes) {
+							typeEarned = new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+							earningsPerType.put(i, typeEarned);
+						}
+						for(Request i:hotel.rem.requests) {
+							if(i.begin.compareTo(trackingDate) >= 0 && i.end.compareTo(today) <= 0 && (i.status == Status.POTVRDJENA || i.status == Status.OTKAZANA)) {
+								earnings[i.begin.getMonthValue() - 1] += i.price;
+								current = earningsPerType.get(i.type);
+								current[i.begin.getMonthValue() - 1] += i.price;
+							}
+						}
+						for(Reservation i:hotel.rem.reservations) {
+							if(i.begin.compareTo(trackingDate) >= 0 && i.end.compareTo(today) <= 0 && i.status != Status.ODBIJENA) {
+								earnings[i.begin.getMonthValue() - 1] += i.price;
+								current = earningsPerType.get(i.room.type);
+								current[i.begin.getMonthValue() - 1] += i.price;
+							}
+						}
+						double yData[] = new double[12];
+						int month = trackingDate.getMonthValue();
+						for(int i = 0; i < 12; i++) {
+							yData[i] = earnings[month - 1];
+							month = month % 12 + 1;
+						}
+						earningsChart.addSeries("Prihod", yData);
+						for(String i:hotel.rom.roomTypes) {
+							yData = new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+							month = trackingDate.getMonthValue();
+							current = earningsPerType.get(i);
+							for(int j = 0; j < 12; j++) {
+								yData[j] = current[month - 1];
+								month = month % 12 + 1;
+							}
+							earningsChart.addSeries(i, yData);
+						}
+						String[] monthNames = {"Januar", "Februar", "Mart", "April", "Maj", "Jun", "Jul", "Avgust",
+								"Septembar", "Oktobar", "Novembar", "Decembar"};
+						Font currentFont = earningsChart.getStyler().getAxisTickLabelsFont();
+						earningsChart.getStyler().setxAxisTickLabelsFormattingFunction(x -> monthNames[(x.intValue() + today.getMonthValue() - 1) % 12]).setAxisTickLabelsFont(new Font(currentFont.getName(), currentFont.getStyle(), 10));
+						reportPanes.add("Zarada", earningsPane);
+						//generisanje drugog izveštaja
+						PieChart cleanerChart = new PieChartBuilder().title("Opterećenje higijenske službe u prethodnih 30 dana").build();
+						JPanel cleanerPane = new XChartPanel(cleanerChart);
+						HashMap<String, Integer> roomsPerCleaner = new HashMap<String, Integer>();
+						for(Employee i:hotel.um.employees) {
+							if(i instanceof Cleaner) {
+								roomsPerCleaner.put(i.getUsername(), 0);
+							}
+						}
+						List<String> buffer = Files.readAllLines(Paths.get("." + sep + "data" + sep + "cleanerlogs.csv"));
+						String[] data = null;
+						for(String i:buffer) {
+							data = i.split(",");
+							if(today.compareTo(LocalDate.parse(data[0])) <= 30){
+								roomsPerCleaner.replace(data[1], roomsPerCleaner.get(data[1]) + 1);
+							}
+						}
+						roomsPerCleaner.forEach((key, value) -> {
+							cleanerChart.addSeries(key + ":" + value.toString(), value);
+						});
+						reportPanes.add("Higijenska služba", cleanerPane);
+						//generisanje trećeg izveštaja
+						PieChart statusChart = new PieChartBuilder().title("Status zahteva i rezervacija u prethodnih 30 dana").build();
+						JPanel statusPane = new XChartPanel(statusChart);
+						HashMap<Status, Integer> resPerStatus = new HashMap<Status, Integer>();
+						for(Status i:Status.values()) {
+							resPerStatus.put(i, 0);
+						}
+						for(Request i:hotel.rem.requests) {
+							if(today.compareTo(i.creationDate) <= 30) {
+								resPerStatus.replace(i.status, resPerStatus.get(i.status) + 1);
+							}
+						}
+						for(Reservation i:hotel.rem.reservations) {
+							if(today.compareTo(i.creationDate) <= 30) {
+								resPerStatus.replace(i.status, resPerStatus.get(i.status) + 1);
+							}
+						}
+						resPerStatus.forEach((key, value) -> {
+							statusChart.addSeries(key.toString() + ":" + value.toString(), value);
+						});
+						reportPanes.add("Statusi", statusPane);
+						report.setBounds(120, 120, 1000, 600);
+						report.setTitle("Izveštaj 4");
+						report.getContentPane().add(reportPanes);
+						report.setVisible(true);
 					}else {
 						JOptionPane.showMessageDialog(null, "Niste odabrali nijednu opciju!");
 					}
@@ -259,6 +372,7 @@ public class ReportsPanel extends JPanel {
 		radioButtons.add(firstReport);
 		radioButtons.add(secondReport);
 		radioButtons.add(thirdReport);
+		radioButtons.add(fourthReport);
 		startLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		startField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		endLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -275,6 +389,7 @@ public class ReportsPanel extends JPanel {
 		add(firstReport);
 		add(secondReport);
 		add(thirdReport);
+		add(fourthReport);
 		add(generate);
 		setVisible(true);
 	}

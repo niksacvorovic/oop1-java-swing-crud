@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import entity.Pricing;
@@ -66,11 +65,11 @@ public class PricingManager {
 				i.endDate = p.startDate;
 				split.startDate = p.endDate;
 				pricings.add(split);
-			}/*else if(i.endDate.compareTo(p.startDate) > 0 && i.endDate.compareTo(p.endDate) < 0) {
+			}else if(i.endDate.compareTo(p.startDate) > 0 && i.endDate.compareTo(p.endDate) < 0) {
 				i.endDate = p.startDate;
 			}else if(i.startDate.compareTo(p.startDate) > 0 && i.startDate.compareTo(p.endDate) < 0) {
 				i.startDate = p.endDate;
-			}*/
+			}
 		}
 		pricings.add(p);
 	}
@@ -90,11 +89,11 @@ public class PricingManager {
 				i.endDate = p.startDate;
 				split.startDate = p.endDate;
 				pricings.add(split);
-			}/*else if(i.endDate.compareTo(p.startDate) > 0 && i.endDate.compareTo(p.endDate) < 0) {
+			}else if(i.endDate.compareTo(p.startDate) > 0 && i.endDate.compareTo(p.endDate) < 0) {
 				i.endDate = p.startDate;
 			}else if(i.startDate.compareTo(p.startDate) > 0 && i.startDate.compareTo(p.endDate) < 0) {
 				i.startDate = p.endDate;
-			}*/
+			}
 		}
 		pricings.add(p);
 	}

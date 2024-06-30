@@ -74,7 +74,7 @@ public class ReservationManager {
 	public Request readRequest(String ID) {
 		Request r = null;
 		for(Request i:requests) {
-			if(i.getID() == ID) {
+			if(i.getID().equals(ID)) {
 				r = i;
 				break;
 			}
@@ -94,7 +94,7 @@ public class ReservationManager {
 	public Reservation createReservation(Request r, Room room) {
 		String ID = reservationID.toString();
 		reservationID ++;
-		Reservation res = new Reservation(ID, r.guest, room, r.begin, r.end, Status.POTVRDJENA, r.price, r.services);
+		Reservation res = new Reservation(ID, r.guest, room, r.creationDate, r.begin, r.end, Status.POTVRDJENA, r.price, r.services);
 		r.guest.userInputs.remove(r);
 		r.guest.userInputs.add(res);
 		reservations.add(res);

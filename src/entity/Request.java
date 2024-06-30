@@ -10,6 +10,7 @@ public class Request {
 	public Guest guest;
 	public Status status;
 	public String type;
+	public LocalDate creationDate;
 	public LocalDate begin;
 	public LocalDate end;
 	public double price;
@@ -21,6 +22,20 @@ public class Request {
 		this.guest = guest;
 		this.status = status;
 		this.type = type;
+		this.creationDate = LocalDate.now();
+		this.begin = begin;
+		this.end = end;
+		this.price = price;
+		this.services = services;
+	}
+	
+	public Request(String ID, Guest guest, Status status, String type, LocalDate creationDate, LocalDate begin, LocalDate end, double price,
+			ArrayList<String> services) {
+		this.ID = ID;
+		this.guest = guest;
+		this.status = status;
+		this.type = type;
+		this.creationDate = creationDate;
 		this.begin = begin;
 		this.end = end;
 		this.price = price;
@@ -48,7 +63,7 @@ public class Request {
 	
 	public String toFileString() {
 		String save = this.getID() + "," + this.guest.getUsername() + "," + this.status.name() + "," + this.type + "," + 
-				this.begin.toString() + "," + this.end.toString() + "," + Double.toString(price);
+				this.creationDate.toString() + "," + this.begin.toString() + "," + this.end.toString() + "," + Double.toString(price);
 		for(String s:this.services) {
 			save += "," + s;
 		}

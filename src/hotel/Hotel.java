@@ -46,7 +46,6 @@ public class Hotel {
 		this.rom = new RoomManager();
 		this.um = new UserManager();
 		this.rfm = new RoomFeatureManager();
-		loadData();
 	}
 	
 	public static Hotel getInstance() {
@@ -58,6 +57,7 @@ public class Hotel {
 	
 	public void loadData() {
 		String sep = System.getProperty("file.separator");
+		LocalDate today = LocalDate.now();
 		try {
 			//učitavanje korisnika
 			List<String> userData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "users.csv"));
@@ -122,10 +122,13 @@ public class Hotel {
 			List<String> requestData = Files.readAllLines(Paths.get("." + sep + "data" + sep + "requests.csv"));
 			for(String i:requestData) {
 				String data[] = i.split(",");
-				Request r = new Request(data[0], (Guest) um.readUser(data[1]), Status.valueOf(data[2]), data[3], 
-						LocalDate.parse(data[4]), LocalDate.parse(data[5]), Double.parseDouble(data[6]), new ArrayList<String>());
-				for(int j = 0; j + 7 < data.length; j++) {
-					r.services.add(data[j + 7]);
+				Request r = new Request(data[0], (Guest) um.readUser(data[1]), Status.valueOf(data[2]), data[3], LocalDate.parse(data[4]),
+						LocalDate.parse(data[5]), LocalDate.parse(data[6]), Double.parseDouble(data[7]), new ArrayList<String>());
+				for(int j = 0; j + 8 < data.length; j++) {
+					r.services.add(data[j + 8]);
+				}
+				if(r.begin.compareTo(today) < 0 && r.status == Status.POTVRDJENA) {
+					r.status = Status.OTKAZANA;
 				}
 				r.guest.userInputs.add(r);
 				rem.requests.add(r);
@@ -135,9 +138,10 @@ public class Hotel {
 			for(String i:reservationData) {
 				String data[] = i.split(",");
 				Reservation r = new Reservation(data[0], (Guest) um.readUser(data[1]), rom.readRoom(data[2]), LocalDate.parse(data[3]),
-						LocalDate.parse(data[4]), Status.valueOf(data[5]) ,Double.parseDouble(data[6]), new ArrayList<String>());
-				for(int j = 0; j + 7 < data.length; j++) {
-					r.services.add(data[j + 7]);
+						LocalDate.parse(data[4]), LocalDate.parse(data[5]), Status.valueOf(data[6]) ,Double.parseDouble(data[7]), 
+						new ArrayList<String>());
+				for(int j = 0; j + 8 < data.length; j++) {
+					r.services.add(data[j + 8]);
 				}
 				r.guest.userInputs.add(r);
 				r.room.reservations.add(r);
@@ -231,7 +235,7 @@ public class Hotel {
 						chosenFeatures.add(feat);
 					}
 				}
-				if(roomFeatures.containsAll(chosenFeatures)) {
+				if(roomFeatures.equals(chosenFeatures)) {
 					available.add(i);
 				}
 			}
@@ -299,7 +303,7 @@ public class Hotel {
 		double price = 0;
 		Pricing current = null;
 		LocalDate date = r.begin;
-		while(r.end.compareTo(date) >= 0) {
+		while(r.end.compareTo(date) > 0) {
 			for(Pricing p:pm.pricings) {
 				if(date.compareTo(p.startDate) > 0 && date.compareTo(p.endDate) <= 0) {
 					current = p;
@@ -324,7 +328,7 @@ public class Hotel {
 		double price = 0;
 		Pricing current = null;
 		LocalDate date = r.begin;
-		while(r.end.compareTo(date) >= 0) {
+		while(r.end.compareTo(date) > 0) {
 			for(Pricing p:pm.pricings) {
 				if(date.compareTo(p.startDate) > 0 && date.compareTo(p.endDate) <= 0) {
 					current = p;
@@ -401,7 +405,7 @@ public class Hotel {
 					}
 				}
 				
-				if(check == true && roomFeatures.containsAll(features)) {
+				if(check == true && roomFeatures.equals(features)) {
 					available.add(r.type);
 				}
 			}
@@ -429,11 +433,11 @@ public class Hotel {
 						roomFeatures.add(link.feature);
 					}
 				}
-				if(!roomFeatures.containsAll(chosenFeatures)) {
+				if(!roomFeatures.equals(chosenFeatures)) {
 					add = false;
 				}
 				for(Reservation res:i.reservations) {
-					if(res.status != Status.POTVRDJENA && begin.compareTo(res.end) <= 0 && end.compareTo(res.begin) >= 0) {
+					if(res.status != Status.OTKAZANA && begin.compareTo(res.end) <= 0 && end.compareTo(res.begin) >= 0) {
 						add = false;
 					}
 				}

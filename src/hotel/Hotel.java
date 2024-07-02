@@ -235,7 +235,7 @@ public class Hotel {
 						chosenFeatures.add(feat);
 					}
 				}
-				if(roomFeatures.equals(chosenFeatures)) {
+				if(roomFeatures.containsAll(chosenFeatures) && roomFeatures.size() == chosenFeatures.size()) {
 					available.add(i);
 				}
 			}
@@ -405,7 +405,7 @@ public class Hotel {
 					}
 				}
 				
-				if(check == true && roomFeatures.equals(features)) {
+				if(check == true && roomFeatures.containsAll(features) && roomFeatures.size() == features.size()) {
 					available.add(r.type);
 				}
 			}
@@ -433,7 +433,7 @@ public class Hotel {
 						roomFeatures.add(link.feature);
 					}
 				}
-				if(!roomFeatures.equals(chosenFeatures)) {
+				if(!(roomFeatures.containsAll(chosenFeatures) && roomFeatures.size() == chosenFeatures.size())) {
 					add = false;
 				}
 				for(Reservation res:i.reservations) {
